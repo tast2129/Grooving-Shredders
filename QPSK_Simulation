@@ -14,7 +14,7 @@ def binary_array_to_int(binary_array):
 
 
 # Integer data to be sent
-input_string = "yoyoyoyo"
+input_string = "Let's gooooo QPSK is working :)"
 
 # Convert string to bytes and then encode with Base64
 encoded_bytes = input_string.encode('utf-8')
