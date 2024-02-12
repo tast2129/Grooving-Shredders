@@ -9,3 +9,5 @@ Download all .ipynb files in Grooving_Shredders/Code and upload manually or thro
 * Within "PYNQ" and "Python" there are a lot of old testing files. The current and in-progress files in these folders are:
   * PYNQ: "Beamforming.ipynb"
   * Python: "beamforming_testing.ipynb"
+
+Email Wes McEvoy @ wemc8162@colorado.edu with any questions.
