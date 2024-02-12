@@ -7,7 +7,7 @@ Download all .ipynb files in Grooving_Shredders/Code and upload manually or thro
 
 * All files within "AnsysHFSS", "GNU Radio", "Vitis", "MATLAB", and "Vivado"
 * Within "PYNQ" and "Python" there are a lot of old testing files. The current and in-progress files in these folders are:
-  * PYNQ: "Beamforming.ipynb"
-  * Python: "beamforming_testing.ipynb"
+  * PYNQ: "beamforming_testing.ipynb"
+  * Python: "delay_and_sum_synthesis.ipynb"
 
 Email Wes McEvoy @ wemc8162@colorado.edu with any questions.
