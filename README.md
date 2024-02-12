@@ -6,7 +6,6 @@ Download all .ipynb files in Grooving_Shredders/Code and upload manually or thro
 # Current files of significance:
 
 * All files within "AnsysHFSS", "GNU Radio", "Vitis", "MATLAB", and "Vivado" *
-* 
-Within "PYNQ" and "Python" there are a lot of old testing files. The current and in-progress files in these folders are:
-PYNQ: "Beamforming.ipynb"
-Python: "beamforming_testing.ipynb"
+* Within "PYNQ" and "Python" there are a lot of old testing files. The current and in-progress files in these folders are: *
+** PYNQ: "Beamforming.ipynb"
+** Python: "beamforming_testing.ipynb"
