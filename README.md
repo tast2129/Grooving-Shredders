@@ -1,5 +1,7 @@
 # This is the git for The Grooving Shredders 23-24 Capstone Team
 
+Email Wes McEvoy @ wemc8162@colorado.edu with any questions.
+
 To push from jupyter server:
 Download all .ipynb files in Grooving_Shredders/Code and upload manually or through a command line in an development platform where the repo has been cloned.
 
@@ -9,5 +11,3 @@ Download all .ipynb files in Grooving_Shredders/Code and upload manually or thro
 * Within "PYNQ" and "Python" there are a lot of old testing files. The current and in-progress files in these folders are:
   * PYNQ: "beamforming_testing.ipynb"
   * Python: "delay_and_sum_synthesis.ipynb"
-
-Email Wes McEvoy @ wemc8162@colorado.edu with any questions.
