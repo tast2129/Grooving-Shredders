@@ -14,15 +14,15 @@ Returns:
 */
 
 dout_t sum_and_delay(din_t in1, din_t in2, din_t in3, din_t in4, din_t bWeights[4]) {
-	#pragma HLS INTERFACE s_axilite port=in1 bundle=BUS_A
-	#pragma HLS INTERFACE s_axilite port=in2 bundle=BUS_A
-	#pragma HLS INTERFACE s_axilite port=in3 bundle=BUS_A
-	#pragma HLS INTERFACE s_axilite port=in4 bundle=BUS_A
+	#pragma HLS INTERFACE m_axi port=in1 bundle=BUS_A
+	#pragma HLS INTERFACE m_axi port=in2 bundle=BUS_A
+	#pragma HLS INTERFACE m_axi port=in3 bundle=BUS_A
+	#pragma HLS INTERFACE m_axi port=in4 bundle=BUS_A
 
 	#pragma HLS INTERFACE gpio port=bWeights bundle=BUS_A
 
 	dout_t weighted_signal;
-	#pragma HLS INTERFACE s_axilite port=weighted_signal bundle=BUS_A
+	#pragma HLS INTERFACE ap_fifo port=weighted_signal bundle=BUS_A
 	
 
     // alternatively ->
