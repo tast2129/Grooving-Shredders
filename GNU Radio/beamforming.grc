@@ -280,7 +280,7 @@ blocks:
     corr7: '0'
     corr8: '0'
     corr9: '0'
-    freq0: '50000000'
+    freq0: '1240000000'
     freq1: 100e6
     freq10: 100e6
     freq11: 100e6
