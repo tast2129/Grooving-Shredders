@@ -21,8 +21,8 @@ typedef struct {
 
 // Define a stepper and the pins it will use
 typedef struct {
-  const float degPerStep = 1.8;
-  const float stepsPerRev = 2 * 360 / 1.8;      // w/ 1.8 deg per step and 360 deg in one revolution. Why the factor of two? who's to say
+  const float degPerStep = .9;
+  const float stepsPerRev = 360 / .9;      // w/ 1.8 deg per step and 360 deg in one revolution. Why the factor of two? who's to say
   volatile float theta = 0;                     // current angle the motor is pointing
   volatile int currentPosition = 0;             // in steps from initial position
   const float ustep = ((float)Microstep);       // cast user define Microstep
@@ -33,17 +33,19 @@ typedef struct {
 stepper stepper1;
 
 int BFG_pin = A0;
-int BFG_value = 0;
-int LH_pin = 8;
+int BFG_recent_val = 0;
+int BFG_current_val = 0;
+int sweep_degrees = 9;
+int number_of_measurements = (sweep_degrees/stepper1.degPerStep) + 1;
  
 void setup() {
   // initialize the serial port at 9600 bps
   Serial.begin(9600);
 
+  
+
   // Define RFSoC Analog in Pin
   pinMode(BFG_pin, INPUT);
-  pinMode(LH_pin, OUTPUT);
-  
 
   // configuring stepper pins
   pinMode(stepper1.Pins.stepPin, OUTPUT); 
@@ -57,78 +59,45 @@ void setup() {
 
 
 void loop() {
-//  while(1){
-//      digitalWrite(LH_pin, LOW);
-//    BFG_value = analogRead(BFG_pin);
-//    if(BFG_value > 600){
-//      Serial.print("Pin is high: "); Serial.println(BFG_value);
-//    }
-//    else{
-//      Serial.print("Pin is low: "); Serial.println(BFG_value);
-//    }
-//    delay(5000);
-//  }
-
-  
-  while (stepper1.currentPosition != stepper1.stepsPerRev) { 
-    // Wait for BFG to drive pin high
-    while(analogRead(BFG_pin) < 600){
-
-    }
-//    delay(1000);
-    
-    // step one step:
-    stepper1.currentPosition++;
-    digitalWrite(stepper1.Pins.dirPin, 1); // rotate clockwise
-
-
-    
-    //printing the angle the stepper motor is point from start and the step # it is on
-    stepper1.theta = stepper1.currentPosition * stepper1.degPerStep * stepper1.ustep;
-    Serial.print("Angle from start: "); Serial.print(stepper1.theta); Serial.print("\° ");
-    Serial.print("at step "); Serial.print(stepper1.currentPosition); Serial.println();
-    digitalWrite(stepper1.Pins.stepPin, 0);
-//    digitalWrite(LH_pin, HIGH);
-//    digitalWrite(LH_pin, LOW); 
+  Serial.println("Waiting for RFSoC..."); Serial.println();
+  while(BFG_current_val == BFG_recent_val){
+    BFG_current_val = digitalRead(BFG_pin); 
+  }
+  if(BFG_current_val == 1){
+    BFG_recent_val = 1;
+  }
+  else{
+    BFG_recent_val = 0;
   }
 
+  Serial.println("Twitching...");
+  // Twitch:
+  stepper1.currentPosition++;
+  digitalWrite(stepper1.Pins.dirPin, 1); // rotate clockwise
+  digitalWrite(stepper1.Pins.stepPin, 1);
+  delay(MeasureTime);
+  digitalWrite(stepper1.Pins.stepPin, 0);
+  
+  //printing the angle the stepper motor is point from start and the step # it is on
+  stepper1.theta = stepper1.currentPosition * stepper1.degPerStep;
+  Serial.println("Twitch complete.");
+  Serial.print("Angle from start at measurement "); Serial.print(stepper1.currentPosition); Serial.print(" is: "); Serial.print(stepper1.theta); Serial.println("\° "); Serial.println();
+
+
+ Serial.print("Number of measurements: "); Serial.println(number_of_measurements);
   // If one full revolution is complete, rotate CCW real fast to reset for new measurement set
-  Serial.println("RESET (Measurement complete)");
-  digitalWrite(stepper1.Pins.dirPin, 0);
-  stepper1.theta = 0;
-  while (stepper1.currentPosition != 0) {
-    digitalWrite(stepper1.Pins.stepPin, 1);
-    delay(500); // this can just be something fast (real fast) this being to fast for the twitch slow down to 500 
-    digitalWrite(stepper1.Pins.stepPin, 0);
-    stepper1.currentPosition--;
+  if(stepper1.currentPosition+1 == number_of_measurements){
+    Serial.println("Measurement complete. Resetting...");
+    digitalWrite(stepper1.Pins.dirPin, 0); // rotate counter clockwise
+    stepper1.theta = 0;
+    while (stepper1.currentPosition != 0) {
+      digitalWrite(stepper1.Pins.stepPin, 1);
+      delay(100); // this can just be something fast (real fast) this being to fast for the twitch slow down to 500 
+      digitalWrite(stepper1.Pins.stepPin, 0);
+      stepper1.currentPosition--;
+    }
+    Serial.println("Reset complete.");
   }
-  
-  
-
-//  // step one step at a time, delaying the amount of time needed for the RFSoC to take one signal intensity measurement
-//  digitalWrite(stepper1.Pins.dirPin, 1); // rotate clockwise
-//  while (stepper1.currentPosition != stepper1.stepsPerRev) { 
-//    // step one step:
-//    stepper1.currentPosition++;
-//    digitalWrite(stepper1.Pins.stepPin, 1);
-//    delay(MeasureTime);
-//    //printing the angle the stepper motor is point from start and the step # it is on
-//    stepper1.theta = stepper1.currentPosition * stepper1.degPerStep * stepper1.ustep;
-//    Serial.print("Angle from start: "); Serial.print(stepper1.theta); Serial.print("\° ");
-//    Serial.print("at step "); Serial.print(stepper1.currentPosition); Serial.println();
-//    digitalWrite(stepper1.Pins.stepPin, 0);
-//  }
-//
-//  // If one full revolution is complete, rotate CCW real fast to reset for new measurement set
-//  Serial.println("RESET (Measurement complete)");
-//  digitalWrite(stepper1.Pins.dirPin, 0);
-//  stepper1.theta = 0;
-//  while (stepper1.currentPosition != 0) {
-//    digitalWrite(stepper1.Pins.stepPin, 1);
-//    delay(500); // this can just be something fast (real fast) this being to fast for the twitch slow down to 500 
-//    digitalWrite(stepper1.Pins.stepPin, 0);
-//    stepper1.currentPosition--;
-//  }
 }
 
 // sets the microstep pins to acheive a microstep based on value of "Step"
