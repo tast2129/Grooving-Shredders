@@ -13,7 +13,7 @@
 
 typedef struct {
   const int stepPin = 2;
-  const int dirPin = 7;
+  const int dirPin = 3;
   const int MS1Pin = 4;
   const int MS2Pin = 5;
   const int MS3Pin = 6;
