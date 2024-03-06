@@ -73,7 +73,7 @@ void loop() {
 
   Serial.println("Twitching...");
   // Twitch:
-  stepper1.currentPosition++;
+  stepper1.currentPosition++; // increment current position (in # of steps from initial position)
   digitalWrite(stepper1.Pins.dirPin, 1); // rotate clockwise
   digitalWrite(stepper1.Pins.stepPin, 1);
   delay(MeasureTime);
@@ -82,7 +82,7 @@ void loop() {
   
   //printing the angle the stepper motor is relative to start and the measurement # it is on
   //stepper1.theta = stepper1.currentPosition * stepper1.degPerStep;
-  stepper1.theta = stepper1.currentPosition * .9;
+  stepper1.theta = stepper1.currentPosition * degPerStep * Microstep;
   Serial.print("Angle from start at measurement "); Serial.print(stepper1.currentPosition); Serial.print(" is: "); Serial.print(stepper1.theta); Serial.println("\° "); Serial.println();
 
   // If one full revolution is complete, rotate CCW real fast to reset for new measurement set
