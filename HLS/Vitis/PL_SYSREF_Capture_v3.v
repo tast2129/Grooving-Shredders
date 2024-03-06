@@ -2,8 +2,11 @@
     operating at the same AXI4-Stream clock frequency (based on the example circuit 
     on page 196 of pg269 (the RF Data Converter LogiCORE IP Product Guide))*/
 module PL_SYSREF_Capture 
-    (input PL_SYSREF_P, PL_SYSREF_N,
-    input PL_CLOCK_P, PL_CLOCK_N,
+    (
+    (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 pl_sysref pl_sysref_p" *) input pl_sysref_p,
+    (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 pl_sysref pl_sysref_n" *) input pl_sysref_n,
+    (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 pl_clk pl_clk_p" *) input pl_clk_p,
+    (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 pl_clk pl_clk_n" *) input pl_clk_n,
     output sysref_adc);
 
     assign CLK_EN = 1;
@@ -17,8 +20,8 @@ module PL_SYSREF_Capture
         .IOSTANDARD("DEFAULT")     // Specify the input I/O standard
     ) IBUFDS_sysref (
         .O(pl_sysref),             // Buffer output
-        .I(PL_SYSREF_P),           // Diff_p buffer input (connect directly to top-level port)
-        .IB(PL_SYSREF_N)           // Diff_n buffer input (connect directly to top-level port)
+        .I(pl_sysref_p),           // Diff_p buffer input (connect directly to top-level port)
+        .IB(pl_sysref_n)           // Diff_n buffer input (connect directly to top-level port)
     );
 
     IBUFDS #(
@@ -27,8 +30,8 @@ module PL_SYSREF_Capture
         .IOSTANDARD("DEFAULT")     // Specify the input I/O standard
     ) IBUFDS_clk (
         .O(pl_clk_in),             // Buffer output
-        .I(PL_CLOCK_P),            // Diff_p buffer input (connect directly to top-level port)
-        .IB(PL_CLOCK_N)            // Diff_n buffer input (connect directly to top-level port)
+        .I(pl_clk_p),              // Diff_p buffer input (connect directly to top-level port)
+        .IB(pl_clk_n)              // Diff_n buffer input (connect directly to top-level port)
     );
     // End of IBUFDS_sysref and IBUFDS_clk instantiation
 
