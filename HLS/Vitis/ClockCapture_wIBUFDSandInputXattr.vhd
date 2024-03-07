@@ -17,10 +17,12 @@ entity clock_capture is
     pl_clk_p : in STD_LOGIC;
     pl_clk_n : in STD_LOGIC;
     sysref_adc : out STD_LOGIC);
+  
 end clock_capture;
 
   
 architecture Behavioral of clock_capture is
+  -- BEGIN declarative Architecture body ->
   ATTRIBUTE X_INTERFACE_INFO : STRING;
   ATTRIBUTE X_INTERFACE_INFO of pl_sysref_p: SIGNAL is "xilinx.com:signal:clock:1.0 pl_sysref pl_sysref_p";
   ATTRIBUTE X_INTERFACE_INFO of pl_sysref_n: SIGNAL is "xilinx.com:signal:clock:1.0 pl_sysref pl_sysref_n";
@@ -65,12 +67,15 @@ architecture Behavioral of clock_capture is
   );
 
   -- End of BUFGCE_clk instantiation
+  -- END declarative Architecture body
 
+  -- BEGIN statement Architecture body ->
   -- differential flip-flop logic
   process (signal)
     if rising_edge(signal) then  -- Older VHDL if (signal'event and signal = '1')
       sysref_adc <= pl_sysref;
     end if;
   end process;
+  -- END statement Architecture body
     
 end Behavioral;
