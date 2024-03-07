@@ -6,6 +6,7 @@ module PL_SYSREF_Capture
     input PL_CLOCK_P, PL_CLOCK_N,
     output sysref_adc);
 
+    reg CLK_EN;
     assign CLK_EN = 1;
     reg pl_clk_in, pl_sysref, pl_clk; 
 
