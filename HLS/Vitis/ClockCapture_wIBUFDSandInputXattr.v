@@ -9,6 +9,7 @@ module PL_SYSREF_Capture
     (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 pl_clk pl_clk_n" *) input pl_clk_n,
     output sysref_adc);
 
+    reg CLK_EN;
     assign CLK_EN = 1;
     reg pl_clk_in, pl_sysref, pl_clk; 
 
