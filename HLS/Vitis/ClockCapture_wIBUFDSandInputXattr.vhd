@@ -28,6 +28,8 @@ architecture Behavioral of clock_capture is
   ATTRIBUTE X_INTERFACE_INFO of pl_clk_p: SIGNAL is "xilinx.com:signal:clock:1.0 pl_clk pl_clk_p";
   ATTRIBUTE X_INTERFACE_INFO of pl_clk_n: SIGNAL is "xilinx.com:signal:clock:1.0 pl_clk pl_clk_n";
 
+ signal pl_sysref, pl_clk_in, pl_clk: STD_LOGIC;
+
   -- IBUFDS: Differential Input Buffer
   --         Virtex UltraScale
   -- Xilinx HDL Language Template, version 2022.1
