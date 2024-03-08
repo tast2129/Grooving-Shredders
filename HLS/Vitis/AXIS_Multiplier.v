@@ -19,9 +19,9 @@ module axis_multiplier (
     
     assign s_axis_s2mm_tvalid = m_axis_tvalid;
     assign s_axis_s2mm_tready = m_axis_tready; // should I only be updating this after the multiplication operation is complete?
-    
+
+    // PLACEHOLDER - katie pls fix this 
     assign s_axis_s2mm_tlast =  m_axis_tlast;
-    
     
     always @(posedge CLK)
         begin
