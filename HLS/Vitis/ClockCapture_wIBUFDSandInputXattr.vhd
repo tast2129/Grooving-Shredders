@@ -17,7 +17,6 @@ entity clock_capture is
     pl_clk_p : in STD_LOGIC;
     pl_clk_n : in STD_LOGIC;
     sysref_adc : out STD_LOGIC);
-  
 end clock_capture;
 
   
