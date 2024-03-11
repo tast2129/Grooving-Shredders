@@ -10,6 +10,7 @@ module axis_multiplier #(
 ) (
     input wire CLK,
     input wire resetn,
+    
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
 
