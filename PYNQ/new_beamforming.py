@@ -346,19 +346,25 @@ b_1 = np.exp(-2j * np.pi * d * 1 * np.sin(theta)) # array factor
 b_2 = np.exp(-2j * np.pi * d * 2 * np.sin(theta)) # array factor
 b_3 = np.exp(-2j * np.pi * d * 3 * np.sin(theta)) # array factor
 
-tx_0 = tx * b_0
-tx_1 = tx * b_1
-tx_2 = tx * b_2
-tx_3 = tx * b_3
+print("Weights:")
+print(b_0)
+print(b_1)
+print(b_2)
+print(b_3)
+
 
 beamformed_data = [[],[],[],[]]
 
 beamformed_figs = make_subplots(specs=[[{"secondary_y": False}]])
 
+
+
 # DELAY
 print(type(b_0))
 if theta_degrees >= 0 and theta_degrees <= 90:
     for ADC, data in enumerate(carrier_data):
+        print(f"Doing ADC: {ADC}, ADC{adc_array[ADC]}")
+
         if ADC not in included_adcs:
             continue
         if ADC == 0:
@@ -366,13 +372,14 @@ if theta_degrees >= 0 and theta_degrees <= 90:
                 beamformed_data[ADC].append(carrier_data[ADC][index] * b_0)
         elif ADC == 1:
             for index, point in enumerate(carrier_data[ADC]):
-                beamformed_data[ADC].append(carrier_data[ADC][index])
+                beamformed_data[ADC].append(carrier_data[ADC][index] * b_1)
+                
         elif ADC == 2:
             for index, point in enumerate(carrier_data[ADC]):
-                beamformed_data[ADC].append(carrier_data[ADC][index])
+                beamformed_data[ADC].append(carrier_data[ADC][index] * b_2)
         elif ADC == 3:
             for index, point in enumerate(carrier_data[ADC]):
-                beamformed_data[ADC].append(carrier_data[ADC][index])
+                beamformed_data[ADC].append(carrier_data[ADC][index] * b_3)
                 # Add interpolated data trace
 
         beamformed_figs.add_trace(
@@ -380,10 +387,8 @@ if theta_degrees >= 0 and theta_degrees <= 90:
         secondary_y=False,
         )
         
-        if(adc_array[ADC] == 'A'):
-            print('debug statement')
-            print(ADC)
-            print(carrier_data[ADC])
+        print(carrier_data[ADC])
+        print(beamformed_data[ADC])
         
         beamformed_figs.update_layout(
         title=f"Time Domain Plot of all Beamformed Data",
@@ -392,7 +397,10 @@ if theta_degrees >= 0 and theta_degrees <= 90:
         )
 elif theta_degrees < 0 and theta_degrees >= -90:
     for ADC, data in enumerate(carrier_data):
+        
+        print(f"Doing ADC: {ADC}, ADC{adc_array[ADC]}")
         if ADC not in included_adcs:
+            print(f"Not included: ADC: {ADC}, ADC{adc_array[ADC]}")
             continue
         if ADC == 0:
             for index, point in enumerate(carrier_data[ADC]):
@@ -411,10 +419,8 @@ elif theta_degrees < 0 and theta_degrees >= -90:
         secondary_y=False,
         )
         
-        if(adc_array[ADC] == 'A'):
-            print('debug statement')
-            print(ADC)
-            print(carrier_data[ADC])
+        print(carrier_data[ADC])
+        print(beamformed_data[ADC])
         
         beamformed_figs.update_layout(
         title=f"Time Domain Plot of all Beamformed Data",
@@ -473,6 +479,14 @@ interpolated_summed_figs.update_layout(
         yaxis_title="Amplitude",
         )
 
+
 interpolated_summed_figs.show()
 
-print(carrier_data)
+
+print(f"Carrier Data Type: {type(carrier_data[0])}")
+
+print(f"Weight Data Type: {type(b_1)}")
+
+test_var = carrier_data[0] * b_1
+
+print(test_var)
