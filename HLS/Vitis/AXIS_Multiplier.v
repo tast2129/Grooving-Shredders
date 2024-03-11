@@ -54,7 +54,6 @@ module axis_multiplier #(
                         m_axis_s2mm_tvalid = 1'b1;
 
 
-                        j = 0;
                         // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                         for(i=0; i<SAMPLES; i++) begin
 
