@@ -5,7 +5,9 @@ module axis_multiplier
   #(
     parameter SDATA_WIDTH = 128,
     parameter SSAMPLE_WIDTH = 8,
-    parameter WEIGHT_WIDTH = 8
+    parameter WEIGHT_WIDTH = 8,
+    parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
+    parameter MDATA_WIDTH = 256     // MSAMPLE_WIDTH * SAMPLES
    ) 
     (
     input wire CLK,
@@ -27,9 +29,7 @@ module axis_multiplier
     input wire m_axis_s2mm_tready,
     output reg m_axis_s2mm_tvalid);
 
-    parameter MSAMPLE_WIDTH = SSAMPLE_WIDTH + WEIGHT_WIDTH;
-    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH;
-    parameter MDATA_WIDTH = MSAMPLE_WIDTH*SAMPLES;
+    integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
 
     integer i;
     
@@ -55,7 +55,7 @@ module axis_multiplier
 
 
                         // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
-                      for(i=0; i<SAMPLES; i=i+1) begin
+                        for(i=0; i<samples; i = i+1) begin
 
                             // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                             m_axis_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= bWeight * s_axis_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
