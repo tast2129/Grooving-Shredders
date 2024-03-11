@@ -1,5 +1,5 @@
 /* 
- * Do not change Module name 
+ * AXI stream multiplier block taking 128-bit input data and 8-bit beamforming weight to apply to data
 */
 module axis_multiplier
   #(
