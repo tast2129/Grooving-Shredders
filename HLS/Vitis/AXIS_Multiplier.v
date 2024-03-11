@@ -3,12 +3,13 @@
 module axis_multiplier #(
     parameter SDATA_WIDTH = 128,
     parameter WEIGHT_WIDTH = 8,
-    parameter SAMPLE_WIDTH = 8,
-    parameter MDATA_WIDTH = ((WEIGHT_WIDTH + SAMPLE_WIDTH)*(SDATA_WIDTH/SAMPLE_WIDTH))
+    parameter SSAMPLE_WIDTH = 8,
+    parameter MSAMPLE_WIDTH = SSAMPLE_WIDTH + WEIGHT_WIDTH;
+    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH;
+    parameter MDATA_WIDTH = MSAMPLE_WIDTH*SAMPLES;
 ) (
     input wire CLK,
     input wire resetn,
-    
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
 
@@ -20,12 +21,12 @@ module axis_multiplier #(
     input [WEIGHT_WIDTH:0] bWeight, // this will be the multiplication factor for all 16 samples, should be <1
 
     output reg [MDATA_WIDTH-1:0] m_axis_s2mm_tdata,
-    output reg [SDATA_WIDTH/SAMPLE_WIDTH-1:0] m_axis_s2mm_tkeep,
+    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m_axis_s2mm_tkeep,
     output reg m_axis_s2mm_tlast,
     input wire m_axis_s2mm_tready,
     output reg m_axis_s2mm_tvalid);
 
-    integer i, j;
+    integer i;
     
     always @(posedge CLK)
         begin
@@ -54,14 +55,10 @@ module axis_multiplier #(
 
                         j = 0;
                         // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
-                        for(i=0; i<SDATA_WIDTH; i = i+SAMPLE_WIDTH) begin
+                        for(i=0; i<SAMPLES; i++) begin
 
-                            // To account for bit growth, we'll use full precision (2x bits) and dma all the data (256 bits total)
-                            // -> when we multiply bits add, so each sample data width will be WEIGHT_WIDTH + SAMPLE_WIDTH
-                            for (j=0; j<MDATA_WIDTH; j = j+SAMPLE_WIDTH+WEIGHT_WIDTH) begin
-                            // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i and j
-                            m_axis_s2mm_tdata[j +: (SAMPLE_WIDTH + WEIGHT_WIDTH)] <= bWeight * s_axis_tdata[i +: SAMPLE_WIDTH];
-                            end
+                            // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
+                            m_axis_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= bWeight * s_axis_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                             
                         end
                     end
