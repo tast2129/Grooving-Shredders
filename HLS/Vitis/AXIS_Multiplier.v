@@ -1,13 +1,13 @@
-/* 128-bit input multiplier block with axi stream inputs */
-
-module axis_multiplier #(
+/* 
+ * Do not change Module name 
+*/
+module axis_multiplier
+  #(
     parameter SDATA_WIDTH = 128,
     parameter SSAMPLE_WIDTH = 8,
-    parameter WEIGHT_WIDTH = 8,
-    parameter MSAMPLE_WIDTH = SSAMPLE_WIDTH + WEIGHT_WIDTH;
-    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH;
-    parameter MDATA_WIDTH = MSAMPLE_WIDTH*SAMPLES;
-) (
+    parameter WEIGHT_WIDTH = 8
+   ) 
+    (
     input wire CLK,
     input wire resetn,
     
@@ -15,7 +15,7 @@ module axis_multiplier #(
      * use of the AXI standard naming convention */
 
     input wire s_axis_tvalid,
-    output wire s_axis_tready,
+    output reg s_axis_tready,
     input wire [SDATA_WIDTH-1:0] s_axis_tdata, // 16 8-bit samples
     input wire s_axis_tlast,
 
@@ -27,19 +27,20 @@ module axis_multiplier #(
     input wire m_axis_s2mm_tready,
     output reg m_axis_s2mm_tvalid);
 
+    parameter MSAMPLE_WIDTH = SSAMPLE_WIDTH + WEIGHT_WIDTH;
+    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH;
+    parameter MDATA_WIDTH = MSAMPLE_WIDTH*SAMPLES;
+
     integer i;
     
     always @(posedge CLK)
         begin
             if (resetn == 1'b0) //~resetn
                 begin
-                    // data out should be 0
+                    // data out, valid, tread, and tlast should all be 0
                     m_axis_s2mm_tdata = 0;
-                    // valid should be 0
                     m_axis_s2mm_tvalid = 0;
-                    // we should not be ready (so 0)
-                    m_axis_s2mm_tready = 0;
-                    // tlast is also 0
+                    s_axis_tready = 0;
                     m_axis_s2mm_tlast = 0;
                 end
             else
@@ -48,10 +49,9 @@ module axis_multiplier #(
                     m_axis_s2mm_tlast <= s_axis_tlast;
 
                     if(m_axis_s2mm_tready && s_axis_tvalid) begin
-                        // tkeep is now high (tkeep = 16'hffff)
-                        m_axis_s2mm_tkeep = 16'hffff;
-                        // tvalid is now high (tvalid = 1'b1)
-                        m_axis_s2mm_tvalid = 1'b1;
+                        // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
+                        m_axis_s2mm_tkeep <= 16'hffff;
+                        m_axis_s2mm_tvalid <= 1'b1;
 
 
                         // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
@@ -62,18 +62,14 @@ module axis_multiplier #(
                             
                         end
                     end
-                    else begin
-                            // things either stay the same,
-                            // e.g., tdata <= tdata,
-                            // or they can be set to some static value
-                            // e.g., tdata <= 128'd0
-                            // but output valid should be low
-                            m_axis_s2mm_tvalid = 0;
-                            // output tkeep should be low too
-                            m_axis_s2mm_tkeep = 0;
+                    else begin 
+                        // invalid data, so output data is set to static value of 0
+                        m_axis_s2mm_tdata <= 256'd0;
 
+                        // output valid and output tkeep should be low
+                        m_axis_s2mm_tvalid <= 0;
+                        m_axis_s2mm_tkeep <= 0;
                     end
                 end
     end
-    
 endmodule
