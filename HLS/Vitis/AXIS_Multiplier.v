@@ -39,7 +39,7 @@ module axis_multiplier #(
                 end
             else
                 begin
-                    // ready goes high tready = 1'b1
+                    // input tready goes high tready = 1'b1
                     m_axis_s2mm_tlast <= s_axis_tlast 
                     if(m_axis_s2mm_tready && s_axis_tvalid) begin
                         // tkeep is now high (tkeep = 16'hffff)
