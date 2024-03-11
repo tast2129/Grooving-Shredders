@@ -1,28 +1,31 @@
 /* 128-bit input multiplier block with axi stream inputs */
 
 module axis_multiplier #(
-    parameter DATA_WIDTH = 128,
-    parameter WEIGHT_WIDTH = 8
+    parameter SDATA_WIDTH = 128,
+    parameter WEIGHT_WIDTH = 8,
+    parameter SAMPLE_WIDTH = 8,
+    parameter MDATA_WIDTH = ((WEIGHT_WIDTH + SAMPLE_WIDTH)*(SDATA_WIDTH/SAMPLE_WIDTH))
 ) (
     input wire CLK,
     input wire resetn,
+    
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
 
     input wire s_axis_tvalid,
     output wire s_axis_tready,
-    input wire [DATA_WIDTH-1:0] s_axis_tdata, // 16 8-bit samples
+    input wire [SDATA_WIDTH-1:0] s_axis_tdata, // 16 8-bit samples
     input wire s_axis_tlast,
 
     input [WEIGHT_WIDTH:0] bWeight, // this will be the multiplication factor for all 16 samples, should be <1
 
-    output reg [DATA_WIDTH-1:0] m_axis_s2mm_tdata,
-    output reg [DATA_WIDTH/8-1:0] m_axis_s2mm_tkeep,
+    output reg [MDATA_WIDTH-1:0] m_axis_s2mm_tdata,
+    output reg [SDATA_WIDTH/SAMPLE_WIDTH-1:0] m_axis_s2mm_tkeep,
     output reg m_axis_s2mm_tlast,
     input wire m_axis_s2mm_tready,
     output reg m_axis_s2mm_tvalid);
 
-    integer i;
+    integer i, j;
     
     always @(posedge CLK)
         begin
@@ -39,35 +42,40 @@ module axis_multiplier #(
                 end
             else
                 begin
-                    // input tready goes high tready = 1'b1
-                    m_axis_s2mm_tlast <= s_axis_tlast 
+                    // input tready goes high (tready = 1'b1)
+                    m_axis_s2mm_tlast <= s_axis_tlast;
+
                     if(m_axis_s2mm_tready && s_axis_tvalid) begin
                         // tkeep is now high (tkeep = 16'hffff)
+                        m_axis_s2mm_tkeep = 16'hffff;
                         // tvalid is now high (tvalid = 1'b1)
+                        m_axis_s2mm_tvalid = 1'b1;
 
+
+                        j = 0;
                         // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
-                        for(i=0; i<(8*16); i=i+8) begin
-                            // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
-                            m_axis_s2mm_tdata[(i+7):i] <= bWeight * s_axis_tdata[(i+7):i]; // syntax change!
-                            // we need to take bit growth into account
-                            // when we multiply bits add
-                            // two options
-                                // option1: use full precision (2x bits) and dma all the data 
-                                // option2: truncate/round to for bit reduction 
-                                    // bweight is 8 bits, data is 16bits, output fp is 24 bits 
+                        for(i=0; i<SDATA_WIDTH; i = i+SAMPLE_WIDTH) begin
+
+                            // To account for bit growth, we'll use full precision (2x bits) and dma all the data (256 bits total)
+                            // -> when we multiply bits add, so each sample data width will be WEIGHT_WIDTH + SAMPLE_WIDTH
+                            for (j=0; j<MDATA_WIDTH; j = j+SAMPLE_WIDTH+WEIGHT_WIDTH) begin
+                            // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i and j
+                            m_axis_s2mm_tdata[j +: (SAMPLE_WIDTH + WEIGHT_WIDTH)] <= bWeight * s_axis_tdata[i +: SAMPLE_WIDTH];
+                            end
+                            
                         end
-                        end
-                        // s_axis_s2mm_tready = m_axis_tready;
-                    else
-                        begin
+                    end
+                    else begin
                             // things either stay the same,
                             // e.g., tdata <= tdata,
                             // or they can be set to some static value
                             // e.g., tdata <= 128'd0
                             // but output valid should be low
+                            m_axis_s2mm_tvalid = 0;
                             // output tkeep should be low too
+                            m_axis_s2mm_tkeep = 0;
 
-                        end
+                    end
                 end
     end
     
