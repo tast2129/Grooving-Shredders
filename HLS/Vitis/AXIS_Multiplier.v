@@ -55,7 +55,7 @@ module axis_multiplier
 
 
                         // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
-                        for(i=0; i<SAMPLES; i++) begin
+                      for(i=0; i<SAMPLES; i=i+1) begin
 
                             // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                             m_axis_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= bWeight * s_axis_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
