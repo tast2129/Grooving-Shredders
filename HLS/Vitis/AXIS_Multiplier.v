@@ -2,8 +2,8 @@
 
 module axis_multiplier #(
     parameter SDATA_WIDTH = 128,
-    parameter WEIGHT_WIDTH = 8,
     parameter SSAMPLE_WIDTH = 8,
+    parameter WEIGHT_WIDTH = 8,
     parameter MSAMPLE_WIDTH = SSAMPLE_WIDTH + WEIGHT_WIDTH;
     parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH;
     parameter MDATA_WIDTH = MSAMPLE_WIDTH*SAMPLES;
