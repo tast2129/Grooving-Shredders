@@ -23,10 +23,10 @@ end clock_capture;
 architecture Behavioral of clock_capture is
   -- BEGIN declarative Architecture body ->
   ATTRIBUTE X_INTERFACE_INFO : STRING;
-  ATTRIBUTE X_INTERFACE_INFO of pl_sysref_p: SIGNAL is "xilinx.com:signal:clock:1.0 pl_sysref pl_sysref_p";
-  ATTRIBUTE X_INTERFACE_INFO of pl_sysref_n: SIGNAL is "xilinx.com:signal:clock:1.0 pl_sysref pl_sysref_n";
-  ATTRIBUTE X_INTERFACE_INFO of pl_clk_p: SIGNAL is "xilinx.com:signal:clock:1.0 pl_clk pl_clk_p";
-  ATTRIBUTE X_INTERFACE_INFO of pl_clk_n: SIGNAL is "xilinx.com:signal:clock:1.0 pl_clk pl_clk_n";
+  ATTRIBUTE X_INTERFACE_INFO of pl_sysref_p: SIGNAL is "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_P";
+  ATTRIBUTE X_INTERFACE_INFO of pl_sysref_n: SIGNAL is "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_N";
+  ATTRIBUTE X_INTERFACE_INFO of pl_clk_p: SIGNAL is "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_P";
+  ATTRIBUTE X_INTERFACE_INFO of pl_clk_n: SIGNAL is "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_N";
 
  signal pl_sysref, pl_clk_in, pl_clk: STD_LOGIC;
 
