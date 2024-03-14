@@ -23,7 +23,7 @@ module axis_quad_adder
     input reg s_axi_awprot,
     input reg s_axi_awregion,
     input reg s_axi_awqos,
-    input reg s_axi_awvalid,
+    input wire s_axi_awvalid,
     input wire [SDATA_WIDTH-1:0] s_axi_tdata, // 16 8-bit samples
     input wire s_axi_tlast,
 
