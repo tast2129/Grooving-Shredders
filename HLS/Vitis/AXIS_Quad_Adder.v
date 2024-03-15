@@ -3,8 +3,8 @@
 */
 module axis_quad_adder
   #(
-    parameter SDATA_WIDTH = 128,
-    parameter MDATA_WIDTH = 256     // MSAMPLE_WIDTH * SAMPLES
+    parameter SDATA_WIDTH = 256,
+    parameter MDATA_WIDTH = 257     // SDATA_WIDTH + 1
    ) 
     (
     input wire CLK,
@@ -186,6 +186,48 @@ module axis_quad_adder
     output reg m_axi_s2mm_tlast,
     input wire m_axi_s2mm_tready,
     output reg m_axi_s2mm_tvalid);
+	
+	output reg s21_axi_awid,
+    output reg s21_axi_awaddr,
+    output reg s21_axi_awlen,
+    output reg s21_axi_awsize,
+    output reg s21_axi_awburst,
+    output reg s21_axi_awlock,
+    output reg s21_axi_awcache,
+    output reg s21_axi_awprot,
+    output reg s21_axi_awregion,
+    output reg s21_axi_awqos,
+    output wire s21_axi_awvalid, //zero when reset
+	output wire s21_axi_awready, //zero when reset
+	output reg s21_axi_wdata,
+	output reg s21_axi_wstrb,
+	output reg s21_axi_wlast,
+	output wire s21_axi_wvalid, //zero when reset
+	output wire s21_axi_wready, //zero when reset
+	output reg s21_axi_bid,
+	output reg s21_axi_bresp,
+	output wire s21_axi_bvalid, //zero when reset
+	output wire s21_axi_bready, //zero when reset
+	output reg s21_axi_arid,
+	output reg s21_axi_araddr,
+	output reg s21_axi_arlen,
+	output reg s21_axi_arsize,
+	output reg s21_axi_arburst,
+	output reg s21_axi_arlock,
+	output reg s21_axi_cache,
+	output reg s21_axi_arprot,
+	output reg s21_axi_arregion,
+	output reg s21_axi_arqos,
+	output wire s21_axi_arvalid, //zero when reset
+	output wire s21_axi_arready, //zero when reset
+	output reg s21_axi_rid,
+	output reg s21_axi_rdata,
+	output reg s21_axi_rresp,
+	output reg s21_axi_rlast,
+	output wire s21_axi_rvalid, //zero when reset
+	output wire s21_axi_rready, //zero when reset
+    output wire [SDATA_WIDTH-1:0] s21_axi_tdata, // 16 8-bit samples
+    output reg s21_axi_tlast, //possibly don't need
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
 
@@ -208,7 +250,6 @@ module axis_quad_adder
 
                     if(m_axis_s2mm_tready && s_axis_tvalid) begin
                         // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
-                        m_axis_s2mm_tkeep <= 16'hffff;
                         m_axis_s2mm_tvalid <= 1'b1;
 
 
