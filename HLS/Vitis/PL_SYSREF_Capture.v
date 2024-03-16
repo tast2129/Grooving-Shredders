@@ -3,10 +3,10 @@
     on page 196 of pg269 (the RF Data Converter LogiCORE IP Product Guide))*/
 module PL_SYSREF_Capture 
     (
-    /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_P" *)*/ input wire pl_sysref_p,
-    /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_N" *)*/ input wire pl_sysref_n,
-    /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_P" *)*/ input wire pl_clk_p,
-    /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_N" *)*/ input wire pl_clk_n,
+    /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_P" *)*/ input pl_sysref_p,
+    /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_N" *)*/ input pl_sysref_n,
+    /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_P" *)*/ input pl_clk_p,
+    /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_N" *)*/ input pl_clk_n,
     output reg sysref_adc);
 
     wire CLK_EN;
