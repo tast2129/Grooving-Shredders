@@ -72,8 +72,8 @@ architecture Behavioral of clock_capture is
 
   -- BEGIN statement Architecture body ->
   -- differential flip-flop logic
-  process (signal)
-    if rising_edge(signal) then  -- Older VHDL if (signal'event and signal = '1')
+  process (pl_sysref)
+    if rising_edge(pl_sysref) then  -- Older VHDL if (signal'event and signal = '1')
       sysref_adc <= pl_sysref;
     end if;
   end process;
