@@ -1,14 +1,19 @@
 /* PL_SYSREF_Capture: PL SYSREF capture circuit where the RF-ADC and RF-DAC are 
     operating at the same AXI4-Stream clock frequency (based on the example circuit 
     on page 196 of pg269 (the RF Data Converter LogiCORE IP Product Guide))*/
+
+// inputs using Xilinx differential clock attributes
+//*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_P" *)*/ input reg pl_sysref_p,
+//*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_N" *)*/ input reg pl_sysref_n,
+//*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_P" *)*/ input wire pl_clk_p,
+//*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_N" *)*/ input wire pl_clk_n,
 `default_nettype none
 
-module PL_SYSREF_Capture 
-    (
-        /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_P" *)*/ input reg pl_sysref_p,
-        /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_sysref CLK_N" *)*/ input reg pl_sysref_n,
-        /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_P" *)*/ input wire pl_clk_p,
-        /*(* X_INTERFACE_INFO = "xilinx.com:interface:diff_clock:1.0 pl_clk CLK_N" *)*/ input wire pl_clk_n,
+module PL_SYSREF_Capture (
+    input reg pl_sysref_p,
+    input reg pl_sysref_n,
+    input wire pl_clk_p,
+    input wire pl_clk_n,
     output reg sysref_adc);
 
     wire CLK_EN;
