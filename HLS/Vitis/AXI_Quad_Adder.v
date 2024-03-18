@@ -111,35 +111,36 @@ module axi_quad_adder
 	input wire [SDATA_WIDTH-1:0] s21_axi_wdata, // 16 8-bit samples
     	input reg s21_axi_wlast, 
 	
-	output reg m_axi_awid,
-    	output reg m_axi_awaddr,
-    	output reg m_axi_awlen,
-    	output reg m_axi_awsize,
-    	output reg m_axi_awburst,
-    	output reg m_axi_awlock,
-    	output reg m_axi_awcache,
-    	output reg m_axi_awprot,
-    	output reg m_axi_awregion,
-    	output reg m_axi_awqos,
-    	output wire m_axi_awvalid, //zero when reset
-	output wire m_axi_awready, //zero when reset
-	output reg m_axi_wdata,
-	output reg m_axi_wstrb,
-	output reg m_axi_wlast,
-	output wire m_axi_wvalid, //zero when reset
-	output wire m_axi_wready, //zero when reset
+	output reg m_axi_arid,
+    	output reg m_axi_araddr,
+    	output reg m_axi_arlen,
+    	output reg m_axi_arsize,
+    	output reg m_axi_arburst,
+    	output reg m_axi_arlock,
+    	output reg m_axi_arcache,
+    	output reg m_axi_arprot,
+    	output reg m_axi_arregion,
+    	output reg m_axi_arqos,
+    	output wire m_axi_arvalid, //zero when reset
+	output wire m_axi_arready, //zero when reset
+	output reg m_axi_rdata,
+	output reg m_axi_rstrb,
+	output reg m_axi_rlast,
+	output wire m_axi_rvalid, //zero when reset
+	output wire m_axi_rready, //zero when reset
 	output reg m_axi_bid,
 	output reg m_axi_bresp,
 	output wire m_axi_bvalid, //zero when reset
 	output wire m_axi_bready, //zero when reset
-	output wire [MDATA_WIDTH-1:0] m_axi_wdata, // 16 8-bit samples
-    	output reg m_axi_wlast //possibly don't need
+	output wire [MDATA_WIDTH-1:0] m_axi_rdata, // 16 8-bit samples
+    	output reg m_axi_rlast //possibly don't need
 	)
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
 
     integer i;
     reg s_axi_wvalid;
+	reg [MSAMPLE_WIDTH
     
     always @(posedge CLK)
         begin
@@ -173,27 +174,31 @@ module axi_quad_adder
             else
                 begin
                     // input tready goes high (tready = 1'b1)
-			m_axi_wlast <= (s00_axi_wlast + s01_axi_wlast + s20_axi_wlast + s21_axi_wlast);
+			m_axi_rlast <= (s00_axi_wlast + s01_axi_wlast + s20_axi_wlast + s21_axi_wlast);
 
 			// if any of the slave axi data streams have valid data, we'll sum them
 			s_axi_wvalid <= s00_axi_wvalid | s01_axi_wvalid | s20_axi_wvalid | s21_axi_wvalid;
+
 			
-			if(m_axi_wready && s_axi_wvalid) begin
+			if(m_axi_rready && s_axi_wvalid) begin
 				// wvalid is now high (wvalid = 1'b1)
-                		m_axi_wvalid <= 1'b1;
-				m_axi_wdata <= s00_axi_wdata + s01_axi_wdata + s20_axi_wdata + s21_axi_wdata;
-			end
-
-
-                        
+                		m_axi_rvalid <= 1'b1;
+				// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
+                        	for(i=0; i<samples; i = i+1) begin
+					m_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= s00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+					+ s01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+					+ s20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+					+ s21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+				end
+			end   
                     end
                     else begin 
                         // invalid data, so output data is set to static value of 0
-                        m_axi_tdata <= 256'd0;
+                        m_axi_rdata <= 256'd0;
 
 			// output valid(s) should be low
-                        m_axi_wvalid = 0;
-			m_axi_awvalid = 0;
+                        m_axi_rvalid = 0;
+			m_axi_arvalid = 0;
                     end
                 end
     end
