@@ -135,8 +135,8 @@ module axi_quad_adder #(
             if (resetn == 1'b0) //~resetn
                 begin
                     // data out, valid, tread, and tlast should all be 0
-                    m_axis_tdata <= 0;
-                    m_axi_tlast <= 0;
+                    m_axis_wdata <= 0;
+                    m_axi_wlast <= 0;
 
 		    // asynchronous write
 		    m_axi_awvalid <= 0;
