@@ -11,6 +11,12 @@ module axi_adder #(
     (
     input wire clock,
     input wire resetn,
+
+    // these will be the multiplication factor for all 16 samples in each channel, each should be <1
+    input [WEIGHT_WIDTH:0] bWeight00_imag, input [WEIGHT_WIDTH:0] bWeight00_real,
+    input [WEIGHT_WIDTH:0] bWeight01_imag, input [WEIGHT_WIDTH:0] bWeight01_real,
+    input [WEIGHT_WIDTH:0] bWeight20_imag, input [WEIGHT_WIDTH:0] bWeight20_real,
+    input [WEIGHT_WIDTH:0] bWeight21_imag, input [WEIGHT_WIDTH:0] bWeight21_real,
     
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
@@ -68,7 +74,7 @@ module axi_adder #(
 
     integer i;
     reg s_axi_wvalid;
-    reg m_axi_rvalid;
+    reg m_axi_rready;
     
     always @(posedge CLK)
         begin
@@ -98,24 +104,42 @@ module axi_adder #(
 		    s20_axi_bready <= 0;
 		    s21_axi_bwready <= 0;
                 end
-            else
-                begin
-                    // input tready goes high (tready = 1'b1)
-			m_axi_rlast <= (s00_axi_wlast + s01_axi_wlast + s20_axi_wlast + s21_axi_wlast);
-
-			// if any of the slave axi data streams have valid data, we'll sum them
-			s_axi_wvalid <= s00_axi_wvalid | s01_axi_wvalid | s20_axi_wvalid | s21_axi_wvalid;
-			m_axi_wvalid <= s00_axi_wvalid | s01_axi_wvalid | s20_axi_wvalid | s21_axi_wvalid;
-
-			
-			if(m00_axi_rready && s_axi_wvalid) begin
+            else begin
+		    // input wready goes high (wready = 1'b1)
+		m00_axi_rlast <= s00_axi_wlast;
+	
+			if(m00_axi_rready && s00_axi_wvalid) begin
 				// wvalid is now high (wvalid = 1'b1)
-                		m_axi_rvalid <= 1'b1;
+                		m00_axi_rvalid <= 1'b1;
 				// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                         	for(i=0; i<samples; i = i+1) begin
 					m00_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= s00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 				end
-			end   
+			end  
+			if(m01_axi_rready && s01_axi_wvalid) begin
+				// wvalid is now high (wvalid = 1'b1)
+				m01_axi_rvalid <= 1'b1;
+				// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
+                        	for(i=0; i<samples; i = i+1) begin
+					m01_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= s01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+				end
+			end 
+			if(m20_axi_rready && s20_axi_wvalid) begin
+				// wvalid is now high (wvalid = 1'b1)
+				m20_axi_rvalid <= 1'b1;
+				// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
+                        	for(i=0; i<samples; i = i+1) begin
+					m20_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= s20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+				end
+			end 
+			if(m21_axi_rready && s21_axi_wvalid) begin
+				// wvalid is now high (wvalid = 1'b1)
+				m21_axi_rvalid <= 1'b1;
+				// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
+                        	for(i=0; i<samples; i = i+1) begin
+					m21_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= s21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+				end
+			end 
                     end
                     else begin 
                         // invalid data, so output data is set to static value of 0
