@@ -26,7 +26,6 @@ module axi_quad_adder #(
     input reg s00_axi_awqos,
     input wire s00_axi_awvalid, //zero when reset
     output wire s00_axi_awready, //zero when reset
-    input reg s00_axi_wdata,
     input reg s00_axi_wstrb,
     input reg s00_axi_wlast,
     input wire s00_axi_wvalid, //zero when reset
@@ -49,7 +48,6 @@ module axi_quad_adder #(
     input reg s01_axi_awqos,
     input wire s01_axi_awvalid, //zero when reset
     output wire s01_axi_awready, //zero when reset
-    input reg s01_axi_wdata,
     input reg s01_axi_wstrb,
     input reg s01_axi_wlast,
     input wire s01_axi_wvalid, //zero when reset
@@ -72,7 +70,6 @@ module axi_quad_adder #(
     input reg s20_axi_awqos,
     input wire s20_axi_awvalid, //zero when reset
     output wire s20_axi_awready, //zero when reset
-    input reg s20_axi_wdata,
     input reg s20_axi_wstrb,
     input reg s20_axi_wlast,
     input wire s20_axi_wvalid, //zero when reset
@@ -95,7 +92,6 @@ module axi_quad_adder #(
     input reg s21_axi_awqos,
     input wire s21_axi_awvalid, //zero when reset
     output wire s21_axi_awready, //zero when reset
-    input reg s21_axi_wdata,
     input reg s21_axi_wstrb,
     input reg s21_axi_wlast,
     input wire s21_axi_wvalid, //zero when reset
@@ -118,7 +114,6 @@ module axi_quad_adder #(
     output reg m_axi_arqos,
     output wire m_axi_arvalid, //zero when reset
     input wire m_axi_arready, //zero when reset
-    output reg m_axi_rdata,
     output reg m_axi_rstrb,
     output reg m_axi_rlast,
     output wire m_axi_rvalid, //zero when reset
