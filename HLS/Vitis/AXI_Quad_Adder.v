@@ -166,6 +166,7 @@ module axi_quad_adder #(
 
 			// if any of the slave axi data streams have valid data, we'll sum them
 			s_axi_wvalid <= s00_axi_wvalid | s01_axi_wvalid | s20_axi_wvalid | s21_axi_wvalid;
+			//m_axi_rready <= m00_axi_rready | m01_axi_rready | m20_axi_rready | m21_axi_rready;
 
 			
 			if(m_axi_rready && s_axi_wvalid) begin
