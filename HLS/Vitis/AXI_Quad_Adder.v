@@ -35,6 +35,27 @@ module axi_quad_adder #(
     input wire s00_axi_bvalid, //zero when reset
     output wire s00_axi_bready, //zero when reset
     input wire [SDATA_WIDTH-1:0] s00_axi_wdata, // 16 8-bit samples
+    input reg s00_axi_arid,
+    input reg s00_axi_araddr,
+    input reg s00_axi_arlen,
+    input reg s00_axi_arsize,
+    input reg s00_axi_arburst,
+    input reg s00_axi_arlock,
+    input reg s00_axi_arcache,
+    input reg s00_axi_arprot,
+    input reg s00_axi_arregion,
+    input reg s00_axi_arqos,
+    input wire s00_axi_arvalid, //zero when reset
+    output wire s00_axi_arready, //zero when reset
+    input reg s00_axi_rstrb,
+    input reg s00_axi_rlast,
+    input wire s00_axi_rvalid, //zero when reset
+    output wire s00_axi_rready, //zero when reset
+    input reg s00_axi_bid,
+    input reg s00_axi_bresp,
+    input wire s00_axi_bvalid, //zero when reset
+    output wire s00_axi_bready, //zero when reset
+    input wire [SDATA_WIDTH-1:0] s00_axi_rdata, // 16 8-bit samples
 		
     input reg s01_axi_awid,
     input reg s01_axi_awaddr,
