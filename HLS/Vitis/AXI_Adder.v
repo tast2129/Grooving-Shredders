@@ -67,7 +67,7 @@ module axi_adder #(
     output reg m21_axi_rlast,
     output wire m21_axi_rvalid, //zero when reset
     input wire m21_axi_rready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m21_axi_rdata, // 16 8-bit samples
+    output wire [MDATA_WIDTH-1:0] m21_axi_rdata // 16 8-bit samples
     );
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
