@@ -1,5 +1,7 @@
 /* 
- * AXI  data adder block taking four 128-bit input data and sums them into a 256-bit output data
+ * AXI data adder block taking four 128-bit input data and outputs them
+ * This block is completely unnecessary and serves to confirm we're interfacing
+ * correctly before implementing the adder portion of this block
 */
 module axi_adder #(
     parameter SDATA_WIDTH = 128,
