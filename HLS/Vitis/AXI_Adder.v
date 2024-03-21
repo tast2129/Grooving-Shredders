@@ -21,53 +21,53 @@ module axi_adder #(
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
 
-    input reg s00_axi_wstrb,
-    input reg s00_axi_wlast,
-    input wire s00_axi_wvalid, //zero when reset
-    output wire s00_axi_wready, //zero when reset
-    input wire [SDATA_WIDTH-1:0] s00_axi_wdata, // 16 8-bit samples
+    input s00_axi_wstrb,
+    input s00_axi_wlast,
+    input s00_axi_wvalid, //zero when reset
+    output s00_axi_wready, //zero when reset
+    input [SDATA_WIDTH-1:0] s00_axi_wdata, // 16 8-bit samples
 		
-    input reg s01_axi_wstrb,
-    input reg s01_axi_wlast,
-    input wire s01_axi_wvalid, //zero when reset
-    output wire s01_axi_wready, //zero when reset
-    input wire [SDATA_WIDTH-1:0] s01_axi_wdata, // 16 8-bit samples
+    input s01_axi_wstrb,
+    input s01_axi_wlast,
+    input s01_axi_wvalid, //zero when reset
+    output s01_axi_wready, //zero when reset
+    input [SDATA_WIDTH-1:0] s01_axi_wdata, // 16 8-bit samples
 		
-    input reg s20_axi_wstrb,
-    input reg s20_axi_wlast,
-    input wire s20_axi_wvalid, //zero when reset
-    output wire s20_axi_wready, //zero when reset
-    input wire [SDATA_WIDTH-1:0] s20_axi_wdata, // 16 8-bit samples
+    input s20_axi_wstrb,
+    input s20_axi_wlast,
+    input s20_axi_wvalid, //zero when reset
+    output s20_axi_wready, //zero when reset
+    input [SDATA_WIDTH-1:0] s20_axi_wdata, // 16 8-bit samples
 		
-    input reg s21_axi_wstrb,
-    input reg s21_axi_wlast,
-    input wire s21_axi_wvalid, //zero when reset
-    output wire s21_axi_wready, //zero when reset
-    input wire [SDATA_WIDTH-1:0] s21_axi_wdata, // 16 8-bit samples
+    input s21_axi_wstrb,
+    input s21_axi_wlast,
+    input s21_axi_wvalid, //zero when reset
+    output s21_axi_wready, //zero when reset
+    input [SDATA_WIDTH-1:0] s21_axi_wdata, // 16 8-bit samples
 	
-    output reg m00_axi_rstrb,
-    output reg m00_axi_rlast,
-    output wire m00_axi_rvalid, //zero when reset
-    input wire m00_axi_rready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m00_axi_rdata, // 16 8-bit samples
+    output m00_axi_rstrb,
+    output m00_axi_rlast,
+    output m00_axi_rvalid, //zero when reset
+    input m00_axi_rready, //zero when reset
+    output [MDATA_WIDTH-1:0] m00_axi_rdata, // 16 8-bit samples
 
-    output reg m01_axi_rstrb,
-    output reg m01_axi_rlast,
-    output wire m01_axi_rvalid, //zero when reset
-    input wire m01_axi_rready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m01_axi_rdata, // 16 8-bit samples
+    output m01_axi_rstrb,
+    output m01_axi_rlast,
+    output m01_axi_rvalid, //zero when reset
+    input m01_axi_rready, //zero when reset
+    output [MDATA_WIDTH-1:0] m01_axi_rdata, // 16 8-bit samples
 
-    output reg m20_axi_rstrb,
-    output reg m20_axi_rlast,
-    output wire m20_axi_rvalid, //zero when reset
-    input wire m20_axi_rready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m20_axi_rdata, // 16 8-bit samples
+    output m20_axi_rstrb,
+    output m20_axi_rlast,
+    output m20_axi_rvalid, //zero when reset
+    input m20_axi_rready, //zero when reset
+    output [MDATA_WIDTH-1:0] m20_axi_rdata, // 16 8-bit samples
 
-    output reg m21_axi_rstrb,
-    output reg m21_axi_rlast,
-    output wire m21_axi_rvalid, //zero when reset
-    input wire m21_axi_rready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m21_axi_rdata // 16 8-bit samples
+    output m21_axi_rstrb,
+    output m21_axi_rlast,
+    output m21_axi_rvalid, //zero when reset
+    input m21_axi_rready, //zero when reset
+    output [MDATA_WIDTH-1:0] m21_axi_rdata // 16 8-bit samples
     );
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
