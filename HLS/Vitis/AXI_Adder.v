@@ -4,8 +4,8 @@
 module axi_adder #(
     parameter SDATA_WIDTH = 128,
     parameter MDATA_WIDTH = 128,     // SDATA_WIDTH + 1
-    parameter SSAMPLE_WIDTH = 16,
-    parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH
+    parameter SSAMPLE_WIDTH = 8,
+    parameter MSAMPLE_WIDTH = 8,   // SSAMPLE_WIDTH
     parameter WEIGHT_WIDTH = 8,
     ) 
     (
@@ -68,19 +68,16 @@ module axi_adder #(
     output wire m21_axi_rvalid, //zero when reset
     input wire m21_axi_rready, //zero when reset
     output wire [MDATA_WIDTH-1:0] m21_axi_rdata, // 16 8-bit samples
-    )
+    );
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
-
     integer i;
-    reg s_axi_wvalid;
-    reg m_axi_rready;
     
     always @(posedge CLK)
         begin
             if (resetn == 1'b0) //~resetn
                 begin
-                    // data out, valid, tread, and tlast should all be 0
+                    // data out, valid, and wlast should all be 0
                     m00_axis_wdata <= 0;
                     m00_axi_wlast <= 0;
 		    m01_axis_wdata <= 0;
