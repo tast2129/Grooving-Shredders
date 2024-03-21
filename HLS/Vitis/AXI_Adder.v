@@ -6,7 +6,7 @@ module axi_adder #(
     parameter MDATA_WIDTH = 128,     // SDATA_WIDTH + 1
     parameter SSAMPLE_WIDTH = 8,
     parameter MSAMPLE_WIDTH = 8,   // SSAMPLE_WIDTH
-    parameter WEIGHT_WIDTH = 8,
+    parameter WEIGHT_WIDTH = 8
     ) 
     (
     input wire clock,
