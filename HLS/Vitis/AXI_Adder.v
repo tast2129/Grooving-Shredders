@@ -11,8 +11,8 @@ module axi_adder #(
     parameter WEIGHT_WIDTH = 8
     ) 
     (
-    input wire clock,
-    input wire resetn,
+    input clock,
+    input resetn,
 
     // these will be the multiplication factor for all 16 samples in each channel, each should be <1
     input [WEIGHT_WIDTH-1:0] bWeight00_imag, input [WEIGHT_WIDTH-1:0] bWeight00_real,
@@ -23,349 +23,317 @@ module axi_adder #(
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
 
-    input reg s00_axi_awid,
-    input reg s00_axi_awaddr,
-    //input reg s00_axi_awlen,
-    input reg s00_axi_awsize,
-    input reg s00_axi_awburst,
-    input reg s00_axi_awlock,
-    input reg s00_axi_awcache,
-    input reg s00_axi_awprot,
-    input reg s00_axi_awregion,
-    input reg s00_axi_awqos,
-    input wire s00_axi_awvalid, //zero when reset
-    output wire s00_axi_awready, //zero when reset
-    input reg s00_axi_wstrb,
-    input reg s00_axi_wlast,
-    input wire s00_axi_wvalid, //zero when reset
-    output wire s00_axi_wready, //zero when reset
-    input reg s00_axi_bid,
-    input reg s00_axi_bresp,
-    input wire s00_axi_bvalid, //zero when reset
-    output wire s00_axi_bready, //zero when reset
-    input wire [SDATA_WIDTH-1:0] s00_axi_wdata, // 16 8-bit samples
-    input reg s00_axi_arid,
-    input reg s00_axi_araddr,
-    //input reg s00_axi_arlen,
-    input reg s00_axi_arsize,
-    input reg s00_axi_arburst,
-    input reg s00_axi_arlock,
-    input reg s00_axi_arcache,
-    input reg s00_axi_arprot,
-    input reg s00_axi_arregion,
-    input reg s00_axi_arqos,
-    input wire s00_axi_arvalid, //zero when reset
-    output wire s00_axi_arready, //zero when reset
-    output reg s00_axi_rresp,
-    output reg s00_axi_rlast,
-    output wire s00_axi_rvalid, //zero when reset
-    input wire s00_axi_rready, //zero when reset
-    output reg s00_axi_bid,
-    output reg s00_axi_bresp,
-    output wire s00_axi_bvalid, //zero when reset
-    input wire s00_axi_bready, //zero when reset
-    output wire [SDATA_WIDTH-1:0] s00_axi_rdata, // 16 8-bit samples
+    input [5:0]             s00_axi_awid,
+    input [48:0]            s00_axi_awaddr,
+    input [7:0]             s00_axi_awlen,
+    input [2:0]             s00_axi_awsize,
+    input [1:0]             s00_axi_awburst,
+    input                   s00_axi_awlock,
+    input [3:0]             s00_axi_awcache,
+    input [2:0]             s00_axi_awprot,
+    input                   s00_axi_awregion,
+    input [3:0]             s00_axi_awqos,
+    input                   s00_axi_awvalid, //zero when reset
+    output                  s00_axi_awready, //zero when reset
+    input [15:0]            s00_axi_wstrb,
+    input                   s00_axi_wlast,
+    input                   s00_axi_wvalid, //zero when reset
+    output                  s00_axi_wready, //zero when reset
+    input [5:0]             s00_axi_bid,
+    input [1:0]             s00_axi_bresp,
+    input                   s00_axi_bvalid, //zero when reset
+    output                  s00_axi_bready, //zero when reset
+    input [SDATA_WIDTH-1:0] s00_axi_wdata, // 16 8-bit samples
+    input [5:0]             s00_axi_arid,
+    input [48:0]            s00_axi_araddr,
+    input [7:0]             s00_axi_arlen,
+    input [2:0]             s00_axi_arsize,
+    input [1:0]             s00_axi_arburst,
+    input                   s00_axi_arlock,
+    input [3:0]             s00_axi_arcache,
+    input [2:0]             s00_axi_arprot,
+    input                   s00_axi_arregion,
+    input [3:0]             s00_axi_arqos,
+    input                   s00_axi_arvalid, //zero when reset
+    output                  s00_axi_arready, //zero when reset
+    output [1:0]            s00_axi_rresp,
+    output                  s00_axi_rlast,
+    output                  s00_axi_rvalid, //zero when reset
+    input                   s00_axi_rready, //zero when reset
+    output[SDATA_WIDTH-1:0] s00_axi_rdata, // 16 8-bit samples
 		
-    input reg s01_axi_awid,
-    input reg s01_axi_awaddr,
-    //input reg s01_axi_awlen,
-    input reg s01_axi_awsize,
-    input reg s01_axi_awburst,
-    input reg s01_axi_awlock,
-    input reg s01_axi_awcache,
-    input reg s01_axi_awprot,
-    input reg s01_axi_awregion,
-    input reg s01_axi_awqos,
-    input wire s01_axi_awvalid, //zero when reset
-    output wire s01_axi_awready, //zero when reset
-    input reg s01_axi_wstrb,
-    input reg s01_axi_wlast,
-    input wire s01_axi_wvalid, //zero when reset
-    output wire s01_axi_wready, //zero when reset
-    input reg s01_axi_bid,
-    input reg s01_axi_bresp,
-    input wire s01_axi_bvalid, //zero when reset
-    output wire s01_axi_bready, //zero when reset
-    input wire [SDATA_WIDTH-1:0] s01_axi_wdata, // 16 8-bit samples
-    input reg s01_axi_arid,
-    input reg s01_axi_araddr,
-    //input reg s01_axi_arlen,
-    input reg s01_axi_arsize,
-    input reg s01_axi_arburst,
-    input reg s01_axi_arlock,
-    input reg s01_axi_arcache,
-    input reg s01_axi_arprot,
-    input reg s01_axi_arregion,
-    input reg s01_axi_arqos,
-    input wire s01_axi_arvalid, //zero when reset
-    output wire s01_axi_arready, //zero when reset
-    output reg s01_axi_rresp,
-    output reg s01_axi_rlast,
-    output wire s01_axi_rvalid, //zero when reset
-    input wire s01_axi_rready, //zero when reset
-    output reg s01_axi_bid,
-    output reg s01_axi_bresp,
-    output wire s01_axi_bvalid, //zero when reset
-    input wire s01_axi_bready, //zero when reset
-    output wire [SDATA_WIDTH-1:0] s01_axi_rdata, // 16 8-bit samples
+    input [5:0]             s01_axi_awid,
+    input [48:0]            s01_axi_awaddr,
+    input [7:0]             s01_axi_awlen,
+    input [2:0]             s01_axi_awsize,
+    input [1:0]             s01_axi_awburst,
+    input                   s01_axi_awlock,
+    input [3:0]             s01_axi_awcache,
+    input [2:0]             s01_axi_awprot,
+    input                   s01_axi_awregion,
+    input [3:0]             s01_axi_awqos,
+    input                   s01_axi_awvalid, //zero when reset
+    output                  s01_axi_awready, //zero when reset
+    input [15:0]            s01_axi_wstrb,
+    input                   s01_axi_wlast,
+    input                   s01_axi_wvalid, //zero when reset
+    output                  s01_axi_wready, //zero when reset
+    input [5:0]             s01_axi_bid,
+    input [1:0]             s01_axi_bresp,
+    input                   s01_axi_bvalid, //zero when reset
+    output                  s01_axi_bready, //zero when reset
+    input [SDATA_WIDTH-1:0] s01_axi_wdata, // 16 8-bit samples
+    input [5:0]             s01_axi_arid,
+    input [48:0]            s01_axi_araddr,
+    input [7:0]             s01_axi_arlen,
+    input [2:0]             s01_axi_arsize,
+    input [1:0]             s01_axi_arburst,
+    input                   s01_axi_arlock,
+    input [3:0]             s01_axi_arcache,
+    input [2:0]             s01_axi_arprot,
+    input                   s01_axi_arregion,
+    input [3:0]             s01_axi_arqos,
+    input                   s01_axi_arvalid, //zero when reset
+    output                  s01_axi_arready, //zero when reset
+    output [1:0]            s01_axi_rresp,
+    output                  s01_axi_rlast,
+    output                  s01_axi_rvalid, //zero when reset
+    input                   s01_axi_rready, //zero when reset
+    output[SDATA_WIDTH-1:0] s01_axi_rdata, // 16 8-bit samples
 		
-	input reg s21_axi_awid,
-    input reg s21_axi_awaddr,
-    //input reg s21_axi_awlen,
-    input reg s21_axi_awsize,
-    input reg s21_axi_awburst,
-    input reg s21_axi_awlock,
-    input reg s21_axi_awcache,
-    input reg s21_axi_awprot,
-    input reg s21_axi_awregion,
-    input reg s21_axi_awqos,
-    input wire s21_axi_awvalid, //zero when reset
-    output wire s21_axi_awready, //zero when reset
-    input reg s21_axi_wstrb,
-    input reg s21_axi_wlast,
-    input wire s21_axi_wvalid, //zero when reset
-    output wire s21_axi_wready, //zero when reset
-    input reg s21_axi_bid,
-    input reg s21_axi_bresp,
-    input wire s21_axi_bvalid, //zero when reset
-    output wire s21_axi_bready, //zero when reset
-    input wire [SDATA_WIDTH-1:0] s21_axi_wdata, // 16 8-bit samples
-    input reg s21_axi_arid,
-    input reg s21_axi_araddr,
-    //input reg s21_axi_arlen,
-    input reg s21_axi_arsize,
-    input reg s21_axi_arburst,
-    input reg s21_axi_arlock,
-    input reg s21_axi_arcache,
-    input reg s21_axi_arprot,
-    input reg s21_axi_arregion,
-    input reg s21_axi_arqos,
-    input wire s21_axi_arvalid, //zero when reset
-    output wire s21_axi_arready, //zero when reset
-    output reg s21_axi_rresp,
-    output reg s21_axi_rlast,
-    output wire s21_axi_rvalid, //zero when reset
-    input wire s21_axi_rready, //zero when reset
-    output reg s21_axi_bid,
-    output reg s21_axi_bresp,
-    output wire s21_axi_bvalid, //zero when reset
-    input wire s21_axi_bready, //zero when reset
-    output wire [SDATA_WIDTH-1:0] s21_axi_rdata, // 16 8-bit samples
+	input [5:0]             s21_axi_awid,
+    input [48:0]            s21_axi_awaddr,
+    input [7:0]             s21_axi_awlen,
+    input [2:0]             s21_axi_awsize,
+    input [1:0]             s21_axi_awburst,
+    input                   s21_axi_awlock,
+    input [3:0]             s21_axi_awcache,
+    input [2:0]             s21_axi_awprot,
+    input                   s21_axi_awregion,
+    input [3:0]             s21_axi_awqos,
+    input                   s21_axi_awvalid, //zero when reset
+    output                  s21_axi_awready, //zero when reset
+    input [15:0]            s21_axi_wstrb,
+    input                   s21_axi_wlast,
+    input                   s21_axi_wvalid, //zero when reset
+    output                  s21_axi_wready, //zero when reset
+    input [5:0]             s21_axi_bid,
+    input [1:0]             s21_axi_bresp,
+    input                   s21_axi_bvalid, //zero when reset
+    output                  s21_axi_bready, //zero when reset
+    input [SDATA_WIDTH-1:0] s21_axi_wdata, // 16 8-bit samples
+    input [5:0]             s21_axi_arid,
+    input [48:0]            s21_axi_araddr,
+    input [7:0]             s21_axi_arlen,
+    input [2:0]             s21_axi_arsize,
+    input [1:0]             s21_axi_arburst,
+    input                   s21_axi_arlock,
+    input [3:0]             s21_axi_arcache,
+    input [2:0]             s21_axi_arprot,
+    input                   s21_axi_arregion,
+    input [3:0]             s21_axi_arqos,
+    input                   s21_axi_arvalid, //zero when reset
+    output                  s21_axi_arready, //zero when reset
+    output [1:0]            s21_axi_rresp,
+    output                  s21_axi_rlast,
+    output                  s21_axi_rvalid, //zero when reset
+    input                   s21_axi_rready, //zero when reset
+    output[SDATA_WIDTH-1:0] s21_axi_rdata, // 16 8-bit samples
 		
-    input reg s20_axi_awid,
-    input reg s20_axi_awaddr,
-    //input reg s20_axi_awlen,
-    input reg s20_axi_awsize,
-    input reg s20_axi_awburst,
-    input reg s20_axi_awlock,
-    input reg s20_axi_awcache,
-    input reg s20_axi_awprot,
-    input reg s20_axi_awregion,
-    input reg s20_axi_awqos,
-    input wire s20_axi_awvalid, //zero when reset
-    output wire s20_axi_awready, //zero when reset
-    input reg s20_axi_wstrb,
-    input reg s20_axi_wlast,
-    input wire s20_axi_wvalid, //zero when reset
-    output wire s20_axi_wready, //zero when reset
-    input reg s20_axi_bid,
-    input reg s20_axi_bresp,
-    input wire s20_axi_bvalid, //zero when reset
-    output wire s20_axi_bready, //zero when reset
-    input wire [SDATA_WIDTH-1:0] s20_axi_wdata, // 16 8-bit samples
-    input reg s20_axi_arid,
-    input reg s20_axi_araddr,
-    //input reg s20_axi_arlen,
-    input reg s20_axi_arsize,
-    input reg s20_axi_arburst,
-    input reg s20_axi_arlock,
-    input reg s20_axi_arcache,
-    input reg s20_axi_arprot,
-    input reg s20_axi_arregion,
-    input reg s20_axi_arqos,
-    input wire s20_axi_arvalid, //zero when reset
-    output wire s20_axi_arready, //zero when reset
-    output reg s20_axi_rresp,
-    output reg s20_axi_rlast,
-    output wire s20_axi_rvalid, //zero when reset
-    input wire s20_axi_rready, //zero when reset
-    output reg s20_axi_bid,
-    output reg s20_axi_bresp,
-    output wire s20_axi_bvalid, //zero when reset
-    input wire s20_axi_bready, //zero when reset
-    output wire [SDATA_WIDTH-1:0] s20_axi_rdata, // 16 8-bit samples
+    input [5:0]             s20_axi_awid,
+    input [48:0]            s20_axi_awaddr,
+    input [7:0]             s20_axi_awlen,
+    input [2:0]             s20_axi_awsize,
+    input [1:0]             s20_axi_awburst,
+    input                   s20_axi_awlock,
+    input [3:0]             s20_axi_awcache,
+    input [2:0]             s20_axi_awprot,
+    input                   s20_axi_awregion,
+    input [3:0]             s20_axi_awqos,
+    input                   s20_axi_awvalid, //zero when reset
+    output                  s20_axi_awready, //zero when reset
+    input [15:0]            s20_axi_wstrb,
+    input                   s20_axi_wlast,
+    input                   s20_axi_wvalid, //zero when reset
+    output                  s20_axi_wready, //zero when reset
+    input [5:0]             s20_axi_bid,
+    input [1:0]             s20_axi_bresp,
+    input                   s20_axi_bvalid, //zero when reset
+    output                  s20_axi_bready, //zero when reset
+    input [SDATA_WIDTH-1:0] s20_axi_wdata, // 16 8-bit samples
+    input [5:0]             s20_axi_arid,
+    input [48:0]            s20_axi_araddr,
+    input [7:0]             s20_axi_arlen,
+    input [2:0]             s20_axi_arsize,
+    input [1:0]             s20_axi_arburst,
+    input                   s20_axi_arlock,
+    input [3:0]             s20_axi_arcache,
+    input [2:0]             s20_axi_arprot,
+    input                   s20_axi_arregion,
+    input [3:0]             s20_axi_arqos,
+    input                   s20_axi_arvalid, //zero when reset
+    output                  s20_axi_arready, //zero when reset
+    output [1:0]            s20_axi_rresp,
+    output                  s20_axi_rlast,
+    output                  s20_axi_rvalid, //zero when reset
+    input                   s20_axi_rready, //zero when reset
+    output[SDATA_WIDTH-1:0] s20_axi_rdata, // 16 8-bit samples
 	
-    output reg m00_axi_awid,
-    output reg m00_axi_awaddr,
-    //output reg m00_axi_awlen,
-    output reg m00_axi_awsize,
-    output reg m00_axi_awburst,
-    output reg m00_axi_awlock,
-    output reg m00_axi_awcache,
-    output reg m00_axi_awprot,
-    output reg m00_axi_awregion,
-    output reg m00_axi_awqos,
-    output wire m00_axi_awvalid, //zero when reset
-    input wire m00_axi_awready, //zero when reset
-    output reg m00_axi_wstrb,
-    output reg m00_axi_wlast,
-    output wire m00_axi_wvalid, //zero when reset
-    input wire m00_axi_wready, //zero when reset
-    output reg m00_axi_bid,
-    output reg m00_axi_bresp,
-    output wire m00_axi_bvalid, //zero when reset
-    input wire m00_axi_bready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m00_axi_wdata, // 16 8-bit samples
-    output reg m00_axi_arid,
-    output reg m00_axi_araddr,
-    //output reg m00_axi_arlen,
-    output reg m00_axi_arsize,
-    output reg m00_axi_arburst,
-    output reg m00_axi_arlock,
-    output reg m00_axi_arcache,
-    output reg m00_axi_arprot,
-    output reg m00_axi_arregion,
-    output reg m00_axi_arqos,
-    output wire m00_axi_arvalid, //zero when reset
-    input wire m00_axi_arready, //zero when reset
-    input reg m00_axi_rresp,
-    input reg m00_axi_rlast,
-    input wire m00_axi_rvalid, //zero when reset
-    output wire m00_axi_rready, //zero when reset
-    input reg m00_axi_bid,
-    input reg m00_axi_bresp,
-    input wire m00_axi_bvalid, //zero when reset
-    output wire m00_axi_bready, //zero when reset
-    input wire [MDATA_WIDTH-1:0] m00_axi_rdata, // 16 8-bit samples
+    output [5:0]            m00_axi_awid,
+    output [48:0]           m00_axi_awaddr,
+    output [7:0]            m00_axi_awlen,
+    output [2:0]            m00_axi_awsize,
+    output [1:0]            m00_axi_awburst,
+    output                  m00_axi_awlock,
+    output [3:0]            m00_axi_awcache,
+    output [2:0]            m00_axi_awprot,
+    output                  m00_axi_awregion,
+    output [3:0]            m00_axi_awqos,
+    output                  m00_axi_awvalid, //zero when reset
+    input                   m00_axi_awready, //zero when reset
+    output [15:0]           m00_axi_wstrb,
+    output                  m00_axi_wlast,
+    output                  m00_axi_wvalid, //zero when reset
+    input                   m00_axi_wready, //zero when reset
+    output[MDATA_WIDTH-1:0] m00_axi_wdata, // 16 8-bit samples
+    output [5:0]            m00_axi_arid,
+    output [48:0]           m00_axi_araddr,
+    output [7:0]            m00_axi_arlen,
+    output [2:0]            m00_axi_arsize,
+    output [1:0]            m00_axi_arburst,
+    output                  m00_axi_arlock,
+    output [3:0]            m00_axi_arcache,
+    output [2:0]            m00_axi_arprot,
+    output                  m00_axi_arregion,
+    output [3:0]            m00_axi_arqos,
+    output                  m00_axi_arvalid, //zero when reset
+    input                   m00_axi_arready, //zero when reset
+    input  [1:0]            m00_axi_rresp,
+    input                   m00_axi_rlast,
+    input                   m00_axi_rvalid, //zero when reset
+    output                  m00_axi_rready, //zero when reset
+    input  [5:0]            m00_axi_bid,
+    input  [1:0]            m00_axi_bresp,
+    input                   m00_axi_bvalid, //zero when reset
+    output                  m00_axi_bready, //zero when reset
+    input [MDATA_WIDTH-1:0] m00_axi_rdata, // 16 8-bit samples
 
-    output reg m01_axi_awid,
-    output reg m01_axi_awaddr,
-    //output reg m01_axi_awlen,
-    output reg m01_axi_awsize,
-    output reg m01_axi_awburst,
-    output reg m01_axi_awlock,
-    output reg m01_axi_awcache,
-    output reg m01_axi_awprot,
-    output reg m01_axi_awregion,
-    output reg m01_axi_awqos,
-    output wire m01_axi_awvalid, //zero when reset
-    input wire m01_axi_awready, //zero when reset
-    output reg m01_axi_wstrb,
-    output reg m01_axi_wlast,
-    output wire m01_axi_wvalid, //zero when reset
-    input wire m01_axi_wready, //zero when reset
-    output reg m01_axi_bid,
-    output reg m01_axi_bresp,
-    output wire m01_axi_bvalid, //zero when reset
-    input wire m01_axi_bready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m01_axi_wdata, // 16 8-bit samples
-    output reg m01_axi_arid,
-    output reg m01_axi_araddr,
-    //output reg m01_axi_arlen,
-    output reg m01_axi_arsize,
-    output reg m01_axi_arburst,
-    output reg m01_axi_arlock,
-    output reg m01_axi_arcache,
-    output reg m01_axi_arprot,
-    output reg m01_axi_arregion,
-    output reg m01_axi_arqos,
-    output wire m01_axi_arvalid, //zero when reset
-    input wire m01_axi_arready, //zero when reset
-    input reg m01_axi_rresp,
-    input reg m01_axi_rlast,
-    input wire m01_axi_rvalid, //zero when reset
-    output wire m01_axi_rready, //zero when reset
-    input reg m01_axi_bid,
-    input reg m01_axi_bresp,
-    input wire m01_axi_bvalid, //zero when reset
-    output wire m01_axi_bready, //zero when reset
-    input wire [MDATA_WIDTH-1:0] m01_axi_rdata, // 16 8-bit samples
+    output [5:0]            m01_axi_awid,
+    output [48:0]           m01_axi_awaddr,
+    output [7:0]            m01_axi_awlen,
+    output [2:0]            m01_axi_awsize,
+    output [1:0]            m01_axi_awburst,
+    output                  m01_axi_awlock,
+    output [3:0]            m01_axi_awcache,
+    output [2:0]            m01_axi_awprot,
+    output                  m01_axi_awregion,
+    output [3:0]            m01_axi_awqos,
+    output                  m01_axi_awvalid, //zero when reset
+    input                   m01_axi_awready, //zero when reset
+    output [15:0]           m01_axi_wstrb,
+    output                  m01_axi_wlast,
+    output                  m01_axi_wvalid, //zero when reset
+    input                   m01_axi_wready, //zero when reset
+    output[MDATA_WIDTH-1:0] m01_axi_wdata, // 16 8-bit samples
+    output [5:0]            m01_axi_arid,
+    output [48:0]           m01_axi_araddr,
+    output [7:0]            m01_axi_arlen,
+    output [2:0]            m01_axi_arsize,
+    output [1:0]            m01_axi_arburst,
+    output                  m01_axi_arlock,
+    output [3:0]            m01_axi_arcache,
+    output [2:0]            m01_axi_arprot,
+    output                  m01_axi_arregion,
+    output [3:0]            m01_axi_arqos,
+    output                  m01_axi_arvalid, //zero when reset
+    input                   m01_axi_arready, //zero when reset
+    input  [1:0]            m01_axi_rresp,
+    input                   m01_axi_rlast,
+    input                   m01_axi_rvalid, //zero when reset
+    output                  m01_axi_rready, //zero when reset
+    input  [5:0]            m01_axi_bid,
+    input  [1:0]            m01_axi_bresp,
+    input                   m01_axi_bvalid, //zero when reset
+    output                  m01_axi_bready, //zero when reset
+    input [MDATA_WIDTH-1:0] m01_axi_rdata, // 16 8-bit samples
 
-    output reg m21_axi_awid,
-    output reg m21_axi_awaddr,
-    //output reg m21_axi_awlen,
-    output reg m21_axi_awsize,
-    output reg m21_axi_awburst,
-    output reg m21_axi_awlock,
-    output reg m21_axi_awcache,
-    output reg m21_axi_awprot,
-    output reg m21_axi_awregion,
-    output reg m21_axi_awqos,
-    output wire m21_axi_awvalid, //zero when reset
-    input wire m21_axi_awready, //zero when reset
-    output reg m21_axi_wstrb,
-    output reg m21_axi_wlast,
-    output wire m21_axi_wvalid, //zero when reset
-    input wire m21_axi_wready, //zero when reset
-    output reg m21_axi_bid,
-    output reg m21_axi_bresp,
-    output wire m21_axi_bvalid, //zero when reset
-    input wire m21_axi_bready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m21_axi_wdata, // 16 8-bit samples
-    output reg m21_axi_arid,
-    output reg m21_axi_araddr,
-    //output reg m21_axi_arlen,
-    output reg m21_axi_arsize,
-    output reg m21_axi_arburst,
-    output reg m21_axi_arlock,
-    output reg m21_axi_arcache,
-    output reg m21_axi_arprot,
-    output reg m21_axi_arregion,
-    output reg m21_axi_arqos,
-    output wire m21_axi_arvalid, //zero when reset
-    input wire m21_axi_arready, //zero when reset
-    input reg m21_axi_rresp,
-    input reg m21_axi_rlast,
-    input wire m21_axi_rvalid, //zero when reset
-    output wire m21_axi_rready, //zero when reset
-    input reg m21_axi_bid,
-    input reg m21_axi_bresp,
-    input wire m21_axi_bvalid, //zero when reset
-    output wire m21_axi_bready, //zero when reset
-    input wire [MDATA_WIDTH-1:0] m21_axi_rdata, // 16 8-bit samples
+    output [5:0]            m21_axi_awid,
+    output [48:0]           m21_axi_awaddr,
+    output [7:0]            m21_axi_awlen,
+    output [2:0]            m21_axi_awsize,
+    output [1:0]            m21_axi_awburst,
+    output                  m21_axi_awlock,
+    output [3:0]            m21_axi_awcache,
+    output [2:0]            m21_axi_awprot,
+    output                  m21_axi_awregion,
+    output [3:0]            m21_axi_awqos,
+    output                  m21_axi_awvalid, //zero when reset
+    input                   m21_axi_awready, //zero when reset
+    output [15:0]           m21_axi_wstrb,
+    output                  m21_axi_wlast,
+    output                  m21_axi_wvalid, //zero when reset
+    input                   m21_axi_wready, //zero when reset
+    output[MDATA_WIDTH-1:0] m21_axi_wdata, // 16 8-bit samples
+    output [5:0]            m21_axi_arid,
+    output [48:0]           m21_axi_araddr,
+    output [7:0]            m21_axi_arlen,
+    output [2:0]            m21_axi_arsize,
+    output [1:0]            m21_axi_arburst,
+    output                  m21_axi_arlock,
+    output [3:0]            m21_axi_arcache,
+    output [2:0]            m21_axi_arprot,
+    output                  m21_axi_arregion,
+    output [3:0]            m21_axi_arqos,
+    output                  m21_axi_arvalid, //zero when reset
+    input                   m21_axi_arready, //zero when reset
+    input  [1:0]            m21_axi_rresp,
+    input                   m21_axi_rlast,
+    input                   m21_axi_rvalid, //zero when reset
+    output                  m21_axi_rready, //zero when reset
+    input  [5:0]            m21_axi_bid,
+    input  [1:0]            m21_axi_bresp,
+    input                   m21_axi_bvalid, //zero when reset
+    output                  m21_axi_bready, //zero when reset
+    input [MDATA_WIDTH-1:0] m21_axi_rdata, // 16 8-bit samples
     
-    output reg m20_axi_awid,
-    output reg m20_axi_awaddr,
-    //output reg m20_axi_awlen,
-    output reg m20_axi_awsize,
-    output reg m20_axi_awburst,
-    output reg m20_axi_awlock,
-    output reg m20_axi_awcache,
-    output reg m20_axi_awprot,
-    output reg m20_axi_awregion,
-    output reg m20_axi_awqos,
-    output wire m20_axi_awvalid, //zero when reset
-    input wire m20_axi_awready, //zero when reset
-    output reg m20_axi_wstrb,
-    output reg m20_axi_wlast,
-    output wire m20_axi_wvalid, //zero when reset
-    input wire m20_axi_wready, //zero when reset
-    output reg m20_axi_bid,
-    output reg m20_axi_bresp,
-    output wire m20_axi_bvalid, //zero when reset
-    input wire m20_axi_bready, //zero when reset
-    output wire [MDATA_WIDTH-1:0] m20_axi_wdata, // 16 8-bit samples
-    output reg m20_axi_arid,
-    output reg m20_axi_araddr,
-    //output reg m20_axi_arlen,
-    output reg m20_axi_arsize,
-    output reg m20_axi_arburst,
-    output reg m20_axi_arlock,
-    output reg m20_axi_arcache,
-    output reg m20_axi_arprot,
-    output reg m20_axi_arregion,
-    output reg m20_axi_arqos,
-    output wire m20_axi_arvalid, //zero when reset
-    input wire m20_axi_arready, //zero when reset
-    input reg m20_axi_rresp,
-    input reg m20_axi_rlast,
-    input wire m20_axi_rvalid, //zero when reset
-    output wire m20_axi_rready, //zero when reset
-    input reg m20_axi_bid,
-    input reg m20_axi_bresp,
-    input wire m20_axi_bvalid, //zero when reset
-    output wire m20_axi_bready, //zero when reset
-    input wire [MDATA_WIDTH-1:0] m20_axi_rdata // 16 8-bit samples
+    output [5:0]            m20_axi_awid,
+    output [48:0]           m20_axi_awaddr,
+    output [7:0]            m20_axi_awlen,
+    output [2:0]            m20_axi_awsize,
+    output [1:0]            m20_axi_awburst,
+    output                  m20_axi_awlock,
+    output [3:0]            m20_axi_awcache,
+    output [2:0]            m20_axi_awprot,
+    output                  m20_axi_awregion,
+    output [3:0]            m20_axi_awqos,
+    output                  m20_axi_awvalid, //zero when reset
+    input                   m20_axi_awready, //zero when reset
+    output [15:0]           m20_axi_wstrb,
+    output                  m20_axi_wlast,
+    output                  m20_axi_wvalid, //zero when reset
+    input                   m20_axi_wready, //zero when reset
+    output[MDATA_WIDTH-1:0] m20_axi_wdata, // 16 8-bit samples
+    output [5:0]            m20_axi_arid,
+    output [48:0]           m20_axi_araddr,
+    output [7:0]            m20_axi_arlen,
+    output [2:0]            m20_axi_arsize,
+    output [1:0]            m20_axi_arburst,
+    output                  m20_axi_arlock,
+    output [3:0]            m20_axi_arcache,
+    output [2:0]            m20_axi_arprot,
+    output                  m20_axi_arregion,
+    output [3:0]            m20_axi_arqos,
+    output                  m20_axi_arvalid, //zero when reset
+    input                   m20_axi_arready, //zero when reset
+    input  [1:0]            m20_axi_rresp,
+    input                   m20_axi_rlast,
+    input                   m20_axi_rvalid, //zero when reset
+    output                  m20_axi_rready, //zero when reset
+    input  [5:0]            m20_axi_bid,
+    input  [1:0]            m20_axi_bresp,
+    input                   m20_axi_bvalid, //zero when reset
+    output                  m20_axi_bready, //zero when reset
+    input [MDATA_WIDTH-1:0] m20_axi_rdata // 16 8-bit samples
     );
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
@@ -396,7 +364,7 @@ module axi_adder #(
 		    s21_axi_wready <= 0;
             end
             else begin
-		/*---------------------------- CHANNEL 00: ADC A ----------------------------*/
+	 //---------------------------- CHANNEL 00: ADC D ----------------------------
 		if(m00_axi_rready && s00_axi_wvalid) begin
 			// input wready goes high (wready = 1'b1)
 	   		m00_axi_rlast <= s00_axi_wlast;
@@ -414,7 +382,7 @@ module axi_adder #(
 			// output valid(s) should be low
             m00_axi_rvalid = 0;
        end
-		/*---------------------------- CHANNEL 01: ADC B ----------------------------*/
+		//---------------------------- CHANNEL 01: ADC C ----------------------------
 		if(m01_axi_rready && s01_axi_wvalid) begin
 			// input wready goes high (wready = 1'b1)
 	   		m01_axi_rlast <= s01_axi_wlast;
@@ -432,7 +400,7 @@ module axi_adder #(
 			// output valid(s) should be low
             m01_axi_rvalid = 0;
         end
-		/*---------------------------- CHANNEL 20: ADC C ----------------------------*/  
+		//---------------------------- CHANNEL 20: ADC B ---------------------------- 
 		if(m20_axi_rready && s20_axi_wvalid) begin
 			// input wready goes high (wready = 1'b1)
 		  	m20_axi_rlast <= s20_axi_wlast;
@@ -450,7 +418,7 @@ module axi_adder #(
 			// output valid(s) should be low
             m20_axi_rvalid = 0;
         end
-		/*---------------------------- CHANNEL 21: ADC D ----------------------------*/
+		//---------------------------- CHANNEL 21: ADC A ----------------------------
 		if(m21_axi_rready && s21_axi_wvalid) begin
 			// input wready goes high (wready = 1'b1)
 		   	m21_axi_rlast <= s21_axi_wlast;
