@@ -101,7 +101,7 @@ module axi_adder #(
     input                   s01_axi_rready, //zero when reset
     output[SDATA_WIDTH-1:0] s01_axi_rdata, // 16 8-bit samples
 		
-	input [5:0]             s21_axi_awid,
+    input [5:0]             s21_axi_awid,
     input [48:0]            s21_axi_awaddr,
     input [7:0]             s21_axi_awlen,
     input [2:0]             s21_axi_awsize,
@@ -340,19 +340,28 @@ module axi_adder #(
     integer i;
     
     always @(posedge CLK) begin
-      if (resetn == 1'b0) //~resetn
-        begin
-          // data out, valid, and wlast should all be 0
-          m_axis_wdata <= 0;
-          m_axi_wlast <= 0;
+	if (resetn == 1'b0) //~resetn
+		begin
+        	// data out, valid, and wlast should all be 0
+          	m00_axis_wdata <= 0;
+          	m00_axi_wlast <= 0;
+		m01_axis_wdata <= 0;
+          	m01_axi_wlast <= 0;
+		m20_axis_wdata <= 0;
+          	m20_axi_wlast <= 0;
+		m21_axis_wdata <= 0;
+          	m21_axi_wlast <= 0;
 
-		      // write
-		      m_axi_rvalid <= 0;
-		      s00_axi_wready <= 0;
-		      s01_axi_wready <= 0;
-		      s20_axi_wready <= 0;
-		      s21_axi_wready <= 0;
-         end
+	  	// write
+		m00_axi_rvalid <= 0;
+		m01_axi_rvalid <= 0;
+		m20_axi_rvalid <= 0;
+		m21_axi_rvalid <= 0;
+	      	s00_axi_wready <= 0;
+	      	s01_axi_wready <= 0;
+	      	s20_axi_wready <= 0;
+	      	s21_axi_wready <= 0;
+ 	        end
       else begin
         // input rready goes high (rready = 1'b1)
         m_axi_rlast <= (s00_axi_wlast | s01_axi_wlast | s20_axi_wlast | s21_axi_wlast);
