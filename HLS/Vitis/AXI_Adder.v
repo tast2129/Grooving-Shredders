@@ -220,24 +220,25 @@ module axi_adder #(
 
     integer i;
     reg S_axi_wvalid;
+    reg [10:0] sampleBuf;
     
-	always @(posedge clock)
+    always @(posedge clock)
         begin
             if (resetn == 1'b0) //~resetn
                 begin
                     // data out, valid, tread, and tlast should all be 0
-                    M_axis_wdata <= 0;
-                    M_axi_wlast <= 0;
+                    M_axis_rdata <= 0;
+                    M_axi_rlast <= 0;
 
 		    // asynchronous write
-		    M_axi_awvalid <= 0;
+		    M_axi_arvalid <= 0;
 		    S00_axi_awready <= 0;
 		    S01_axi_awready <= 0;
 		    S20_axi_awready <= 0;
 		    S21_axi_awready <= 0;
 
 		    // write
-		    M_axi_wvalid <= 0;
+		    M_axi_rvalid <= 0;
 		    S00_axi_wready <= 0;
 		    S01_axi_wready <= 0;
 		    S20_axi_wready <= 0;
@@ -263,10 +264,13 @@ module axi_adder #(
                 		M_axi_rvalid <= 1'b1;
 				// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                         	for(i=0; i<samples; i = i+1) begin
-					M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= S00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+					sampleBuf <= S00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
 					+ S01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
 					+ S20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
 					+ S21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+					
+					// truncate each output sample by 3 bits
+					M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[10:3]; // katie figure out how to round this rather than just floor()-ing it
 				end
 			end   
                     end
