@@ -1,7 +1,7 @@
 /* 
  * AXI  data adder block taking four 128-bit input data and sums them into a 256-bit output data
 */
-module axi_quad_adder #(
+module axi_adder #(
     parameter SDATA_WIDTH = 256,
     parameter MDATA_WIDTH = 257,     // SDATA_WIDTH + 1
     parameter SSAMPLE_WIDTH = 16,
