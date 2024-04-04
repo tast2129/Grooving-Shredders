@@ -336,7 +336,6 @@ module axi_adder #(
     input [MDATA_WIDTH-1:0] M20_axi_rdata // 16 8-bit samples
     );
 
-    
     assign M00_axi_awid = S00_axi_awid;
     assign M00_axi_awaddr = S00_axi_awaddr;
     assign M00_axi_awlen = S00_axi_awlen;
@@ -346,6 +345,45 @@ module axi_adder #(
     assign M00_axi_awcache = S00_axi_awcache;
     assign M00_axi_awprot = S00_axi_awprot;
     assign M00_axi_awregion = S00_axi_awregion;
+    assign M00_axi_awqos = S00_axi_awqos;
+    assign M00_axi_awvalid = S00_axi_awvalid;
+    assign M00_axi_awready = S00_axi_awready; //zero when reset
+    assign M00_axi_wstrb = S00_axi_wstrb;
+    assign M00_axi_wlast = S00_axi_wlast;
+    assign M00_axi_wvalid = S00_axi_wvalid; //zero when reset
+    assign M00_axi_wready = S00_axi_wready; //zero when reset
+    assign M00_axi_bid = S00_axi_bid;
+    assign M00_axi_bresp = S00_axi_bresp;
+    assign M00_axi_bvalid = S00_axi_bvalid; //zero when reset
+    assign M00_axi_bready = S00_axi_bready; //zero when reset
+    assign M00_axi_wdata = S00_axi_wdata; // 16 8-bit samples
+    assign M00_axi_arid = S00_axi_arid;
+    assign M00_axi_araddr = S00_axi_araddr;
+    assign M00_axi_arlen = S00_axi_arlen;
+    assign M00_axi_arsize = S00_axi_arsize;
+    assign M00_axi_arburst = S00_axi_arburst;
+    assign M00_axi_arlock = S00_axi_arlock;
+    assign M00_axi_arcache = S00_axi_arcache;
+    assign M00_axi_arprot = S00_axi_arprot;
+    assign M00_axi_arregion = S00_axi_arregion;
+    assign M00_axi_arqos = S00_axi_arqos;
+    assign M00_axi_arvalid = S00_axi_arvalid; //zero when reset
+    assign M00_axi_arready = S00_axi_arready; //zero when reset
+    assign M00_axi_rresp = S00_axi_rresp;
+    assign M00_axi_rlast = S00_axi_rlast;
+    assign M00_axi_rvalid = S00_axi_rvalid; //zero when reset
+    assign M00_axi_rready = S00_axi_rready; //zero when reset
+    assign M00_axi_rdata = S00_axi_rdata; // 16 8-bit samples
+
+    assign M01_axi_awid = S01_axi_awid;
+    assign M00_axi_awaddr = S01_axi_awaddr;
+    assign M00_axi_awlen = S01_axi_awlen;
+    assign M00_axi_awsize = S01_axi_awsize;
+    assign M00_axi_awburst = S01_axi_awburst;
+    assign M00_axi_awlock = S01_axi_awlock;
+    assign M00_axi_awcache = S01_axi_awcache;
+    assign M00_axi_awprot = S01_axi_awprot;
+    assign M00_axi_awregion = S0_axi_awregion;
     assign M00_axi_awqos = S00_axi_awqos;
     assign M00_axi_awvalid = S00_axi_awvalid;
     assign M00_axi_awready = S00_axi_awready; //zero when reset
