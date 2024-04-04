@@ -101,8 +101,8 @@ module axi_adder #(
     input                   S01_axi_rready, //zero when reset
     output[SDATA_WIDTH-1:0] S01_axi_rdata, // 16 8-bit samples
 		
-	input [5:0]             S21_axi_awid,
-    input [63:0]            S21_axi_awaddr,
+    input [5:0]             S21_axi_awid,
+    input [48:0]            S21_axi_awaddr,
     input [7:0]             S21_axi_awlen,
     input [2:0]             S21_axi_awsize,
     input [1:0]             S21_axi_awburst,
@@ -141,7 +141,7 @@ module axi_adder #(
     output[SDATA_WIDTH-1:0] S21_axi_rdata, // 16 8-bit samples
 		
     input [5:0]             S20_axi_awid,
-    input [63:0]            S20_axi_awaddr,
+    input [48:0]            S20_axi_awaddr,
     input [7:0]             S20_axi_awlen,
     input [2:0]             S20_axi_awsize,
     input [1:0]             S20_axi_awburst,
@@ -180,7 +180,7 @@ module axi_adder #(
     output[SDATA_WIDTH-1:0] S20_axi_rdata, // 16 8-bit samples
 	
     output [5:0]            M00_axi_awid,
-    output [63:0]           M00_axi_awaddr,
+    output [48:0]           M00_axi_awaddr,
     output [7:0]            M00_axi_awlen,
     output [2:0]            M00_axi_awsize,
     output [1:0]            M00_axi_awburst,
@@ -219,7 +219,7 @@ module axi_adder #(
     input [MDATA_WIDTH-1:0] M00_axi_rdata, // 16 8-bit samples
 
     output [5:0]            M01_axi_awid,
-    output [63:0]           M01_axi_awaddr,
+    output [48:0]           M01_axi_awaddr,
     output [7:0]            M01_axi_awlen,
     output [2:0]            M01_axi_awsize,
     output [1:0]            M01_axi_awburst,
@@ -258,7 +258,7 @@ module axi_adder #(
     input [MDATA_WIDTH-1:0] M01_axi_rdata, // 16 8-bit samples
 
     output [5:0]            M21_axi_awid,
-    output [63:0]           M21_axi_awaddr,
+    output [48:0]           M21_axi_awaddr,
     output [7:0]            M21_axi_awlen,
     output [2:0]            M21_axi_awsize,
     output [1:0]            M21_axi_awburst,
@@ -297,7 +297,7 @@ module axi_adder #(
     input [MDATA_WIDTH-1:0] M21_axi_rdata, // 16 8-bit samples
     
     output [5:0]            M20_axi_awid,
-    output [63:0]           M20_axi_awaddr,
+    output [48:0]           M20_axi_awaddr,
     output [7:0]            M20_axi_awlen,
     output [2:0]            M20_axi_awsize,
     output [1:0]            M20_axi_awburst,
