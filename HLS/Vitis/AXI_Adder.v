@@ -176,161 +176,44 @@ module axi_adder #(
     input                   S20_axi_rready, //zero when reset
     output[SDATA_WIDTH-1:0] S20_axi_rdata, // 16 8-bit samples
 	
-    output [5:0]            M00_axi_awid,
-    output [48:0]           M00_axi_awaddr,
-    output [7:0]            M00_axi_awlen,
-    output [2:0]            M00_axi_awsize,
-    output [1:0]            M00_axi_awburst,
-    output                  M00_axi_awlock,
-    output [3:0]            M00_axi_awcache,
-    output [2:0]            M00_axi_awprot,
-    output                  M00_axi_awregion,
-    output [3:0]            M00_axi_awqos,
-    output                  M00_axi_awvalid, //zero when reset
-    input                   M00_axi_awready, //zero when reset
-    output [15:0]           M00_axi_wstrb,
-    output                  M00_axi_wlast,
-    output                  M00_axi_wvalid, //zero when reset
-    input                   M00_axi_wready, //zero when reset
-    output[MDATA_WIDTH-1:0] M00_axi_wdata, // 16 8-bit samples
-    output [5:0]            M00_axi_arid,
-    output [63:0]           M00_axi_araddr,
-    output [7:0]            M00_axi_arlen,
-    output [2:0]            M00_axi_arsize,
-    output [1:0]            M00_axi_arburst,
-    output                  M00_axi_arlock,
-    output [3:0]            M00_axi_arcache,
-    output [2:0]            M00_axi_arprot,
-    output                  M00_axi_arregion,
-    output [3:0]            M00_axi_arqos,
-    output                  M00_axi_arvalid, //zero when reset
-    input                   M00_axi_arready, //zero when reset
-    input  [1:0]            M00_axi_rresp,
-    input                   M00_axi_rlast,
-    input                   M00_axi_rvalid, //zero when reset
-    output                  M00_axi_rready, //zero when reset
-    input  [5:0]            M00_axi_bid,
-    input  [1:0]            M00_axi_bresp,
-    input                   M00_axi_bvalid, //zero when reset
-    output                  M00_axi_bready, //zero when reset
-    input [MDATA_WIDTH-1:0] M00_axi_rdata, // 16 8-bit samples
-
-    output [5:0]            M01_axi_awid,
-    output [48:0]           M01_axi_awaddr,
-    output [7:0]            M01_axi_awlen,
-    output [2:0]            M01_axi_awsize,
-    output [1:0]            M01_axi_awburst,
-    output                  M01_axi_awlock,
-    output [3:0]            M01_axi_awcache,
-    output [2:0]            M01_axi_awprot,
-    output                  M01_axi_awregion,
-    output [3:0]            M01_axi_awqos,
-    output                  M01_axi_awvalid, //zero when reset
-    input                   M01_axi_awready, //zero when reset
-    output [15:0]           M01_axi_wstrb,
-    output                  M01_axi_wlast,
-    output                  M01_axi_wvalid, //zero when reset
-    input                   M01_axi_wready, //zero when reset
-    output[MDATA_WIDTH-1:0] M01_axi_wdata, // 16 8-bit samples
-    output [5:0]            M01_axi_arid,
-    output [63:0]           M01_axi_araddr,
-    output [7:0]            M01_axi_arlen,
-    output [2:0]            M01_axi_arsize,
-    output [1:0]            M01_axi_arburst,
-    output                  M01_axi_arlock,
-    output [3:0]            M01_axi_arcache,
-    output [2:0]            M01_axi_arprot,
-    output                  M01_axi_arregion,
-    output [3:0]            M01_axi_arqos,
-    output                  M01_axi_arvalid, //zero when reset
-    input                   M01_axi_arready, //zero when reset
-    input  [1:0]            M01_axi_rresp,
-    input                   M01_axi_rlast,
-    input                   M01_axi_rvalid, //zero when reset
-    output                  M01_axi_rready, //zero when reset
-    input  [5:0]            M01_axi_bid,
-    input  [1:0]            M01_axi_bresp,
-    input                   M01_axi_bvalid, //zero when reset
-    output                  M01_axi_bready, //zero when reset
-    input [MDATA_WIDTH-1:0] M01_axi_rdata, // 16 8-bit samples
-
-    output [5:0]            M21_axi_awid,
-    output [48:0]           M21_axi_awaddr,
-    output [7:0]            M21_axi_awlen,
-    output [2:0]            M21_axi_awsize,
-    output [1:0]            M21_axi_awburst,
-    output                  M21_axi_awlock,
-    output [3:0]            M21_axi_awcache,
-    output [2:0]            M21_axi_awprot,
-    output                  M21_axi_awregion,
-    output [3:0]            M21_axi_awqos,
-    output                  M21_axi_awvalid, //zero when reset
-    input                   M21_axi_awready, //zero when reset
-    output [15:0]           M21_axi_wstrb,
-    output                  M21_axi_wlast,
-    output                  M21_axi_wvalid, //zero when reset
-    input                   M21_axi_wready, //zero when reset
-    output[MDATA_WIDTH-1:0] M21_axi_wdata, // 16 8-bit samples
-    output [5:0]            M21_axi_arid,
-    output [63:0]           M21_axi_araddr,
-    output [7:0]            M21_axi_arlen,
-    output [2:0]            M21_axi_arsize,
-    output [1:0]            M21_axi_arburst,
-    output                  M21_axi_arlock,
-    output [3:0]            M21_axi_arcache,
-    output [2:0]            M21_axi_arprot,
-    output                  M21_axi_arregion,
-    output [3:0]            M21_axi_arqos,
-    output                  M21_axi_arvalid, //zero when reset
-    input                   M21_axi_arready, //zero when reset
-    input  [1:0]            M21_axi_rresp,
-    input                   M21_axi_rlast,
-    input                   M21_axi_rvalid, //zero when reset
-    output                  M21_axi_rready, //zero when reset
-    input  [5:0]            M21_axi_bid,
-    input  [1:0]            M21_axi_bresp,
-    input                   M21_axi_bvalid, //zero when reset
-    output                  M21_axi_bready, //zero when reset
-    input [MDATA_WIDTH-1:0] M21_axi_rdata, // 16 8-bit samples
-    
-    output [5:0]            M20_axi_awid,
-    output [48:0]           M20_axi_awaddr,
-    output [7:0]            M20_axi_awlen,
-    output [2:0]            M20_axi_awsize,
-    output [1:0]            M20_axi_awburst,
-    output                  M20_axi_awlock,
-    output [3:0]            M20_axi_awcache,
-    output [2:0]            M20_axi_awprot,
-    output                  M20_axi_awregion,
-    output [3:0]            M20_axi_awqos,
-    output                  M20_axi_awvalid, //zero when reset
-    input                   M20_axi_awready, //zero when reset
-    output [15:0]           M20_axi_wstrb,
-    output                  M20_axi_wlast,
-    output                  M20_axi_wvalid, //zero when reset
-    input                   M20_axi_wready, //zero when reset
-    output[MDATA_WIDTH-1:0] M20_axi_wdata, // 16 8-bit samples
-    output [5:0]            M20_axi_arid,
-    output [63:0]           M20_axi_araddr,
-    output [7:0]            M20_axi_arlen,
-    output [2:0]            M20_axi_arsize,
-    output [1:0]            M20_axi_arburst,
-    output                  M20_axi_arlock,
-    output [3:0]            M20_axi_arcache,
-    output [2:0]            M20_axi_arprot,
-    output                  M20_axi_arregion,
-    output [3:0]            M20_axi_arqos,
-    output                  M20_axi_arvalid, //zero when reset
-    input                   M20_axi_arready, //zero when reset
-    input  [1:0]            M20_axi_rresp,
-    input                   M20_axi_rlast,
-    input                   M20_axi_rvalid, //zero when reset
-    output                  M20_axi_rready, //zero when reset
-    input  [5:0]            M20_axi_bid,
-    input  [1:0]            M20_axi_bresp,
-    input                   M20_axi_bvalid, //zero when reset
-    output                  M20_axi_bready, //zero when reset
-    input [MDATA_WIDTH-1:0] M20_axi_rdata // 16 8-bit samples
+    output [5:0]            M_axi_awid,
+    output [48:0]           M_axi_awaddr,
+    output [7:0]            M_axi_awlen,
+    output [2:0]            M_axi_awsize,
+    output [1:0]            M_axi_awburst,
+    output                  M_axi_awlock,
+    output [3:0]            M_axi_awcache,
+    output [2:0]            M_axi_awprot,
+    output                  M_axi_awregion,
+    output [3:0]            M_axi_awqos,
+    output                  M_axi_awvalid, //zero when reset
+    input                   M_axi_awready, //zero when reset
+    output [15:0]           M_axi_wstrb,
+    output                  M_axi_wlast,
+    output                  M_axi_wvalid, //zero when reset
+    input                   M_axi_wready, //zero when reset
+    output[MDATA_WIDTH-1:0] M_axi_wdata, // 16 8-bit samples
+    output [5:0]            M_axi_arid,
+    output [63:0]           M_axi_araddr,
+    output [7:0]            M_axi_arlen,
+    output [2:0]            M_axi_arsize,
+    output [1:0]            M_axi_arburst,
+    output                  M_axi_arlock,
+    output [3:0]            M_axi_arcache,
+    output [2:0]            M_axi_arprot,
+    output                  M_axi_arregion,
+    output [3:0]            M_axi_arqos,
+    output                  M_axi_arvalid, //zero when reset
+    input                   M_axi_arready, //zero when reset
+    input  [1:0]            M_axi_rresp,
+    input                   M_axi_rlast,
+    input                   M_axi_rvalid, //zero when reset
+    output                  M_axi_rready, //zero when reset
+    input  [5:0]            M_axi_bid,
+    input  [1:0]            M_axi_bresp,
+    input                   M_axi_bvalid, //zero when reset
+    output                  M_axi_bready, //zero when reset
+    input [MDATA_WIDTH-1:0] M_axi_rdata, // 16 8-bit samples
     )
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
@@ -343,59 +226,57 @@ module axi_adder #(
             if (resetn == 1'b0) //~resetn
                 begin
                     // data out, valid, tread, and tlast should all be 0
-                    m_axis_wdata <= 0;
-                    m_axi_wlast <= 0;
+                    M_axis_wdata <= 0;
+                    M_axi_wlast <= 0;
 
 		    // asynchronous write
-		    m_axi_awvalid <= 0;
-		    s00_axi_awready <= 0;
-		    s01_axi_awready <= 0;
-		    s20_axi_awready <= 0;
-		    s21_axi_awready <= 0;
+		    M_axi_awvalid <= 0;
+		    S00_axi_awready <= 0;
+		    S01_axi_awready <= 0;
+		    S20_axi_awready <= 0;
+		    S21_axi_awready <= 0;
 
 		    // write
-		    m_axi_wvalid <= 0;
-		    s00_axi_wready <= 0;
-		    s01_axi_wready <= 0;
-		    s20_axi_wready <= 0;
-		    s21_axi_wready <= 0;
+		    M_axi_wvalid <= 0;
+		    S00_axi_wready <= 0;
+		    S01_axi_wready <= 0;
+		    S20_axi_wready <= 0;
+		    S21_axi_wready <= 0;
 
 	            // ?
-		    m_axi_bvalid <= 0;
-		    s00_axi_bready <= 0;
-		    s01_axi_bready <= 0;
-		    s20_axi_bready <= 0;
-		    s21_axi_bwready <= 0;
+		    M_axi_bvalid <= 0;
+		    S00_axi_bready <= 0;
+		    S01_axi_bready <= 0;
+		    S20_axi_bready <= 0;
+		    S21_axi_bwready <= 0;
                 end
             else
                 begin
                     // input tready goes high (tready = 1'b1)
-			m_axi_rlast <= (s00_axi_wlast + s01_axi_wlast + s20_axi_wlast + s21_axi_wlast);
+		    M_axi_rlast <= S00_axi_wlast + S01_axi_wlast + S20_axi_wlast + S21_axi_wlast);
 
-			// if any of the slave axi data streams have valid data, we'll sum them
-			s_axi_wvalid <= s00_axi_wvalid | s01_axi_wvalid | s20_axi_wvalid | s21_axi_wvalid;
-			//m_axi_rready <= m00_axi_rready | m01_axi_rready | m20_axi_rready | m21_axi_rready;
-
+		    // if any of the slave axi data streams have valid data, we'll sum them
+	            S_axi_wvalid <= S00_axi_wvalid | S01_axi_wvalid | S20_axi_wvalid | S21_axi_wvalid;
 			
-			if(m_axi_rready && s_axi_wvalid) begin
+			if(M_axi_rready && S_axi_wvalid) begin
 				// wvalid is now high (wvalid = 1'b1)
-                		m_axi_rvalid <= 1'b1;
+                		M_axi_rvalid <= 1'b1;
 				// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                         	for(i=0; i<samples; i = i+1) begin
-					m_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= s00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-					+ s01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-					+ s20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-					+ s21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+					M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= S00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+					+ S01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+					+ S20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+					+ S21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 				end
 			end   
                     end
                     else begin 
                         // invalid data, so output data is set to static value of 0
-                        m_axi_rdata <= 256'd0;
+                        M_axi_rdata <= 256'd0;
 
 			// output valid(s) should be low
-                        m_axi_rvalid = 0;
-			m_axi_arvalid = 0;
+                        M_axi_rvalid = 0;
+			M_axi_arvalid = 0;
                     end
                 end
     end
