@@ -219,9 +219,9 @@ module axi_adder #(
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
 
     integer i;
-    reg s_axi_wvalid;
+    reg S_axi_wvalid;
     
-    always @(posedge CLK)
+	always @(posedge clock)
         begin
             if (resetn == 1'b0) //~resetn
                 begin
@@ -243,7 +243,7 @@ module axi_adder #(
 		    S20_axi_wready <= 0;
 		    S21_axi_wready <= 0;
 
-	            // ?
+	            // burst
 		    M_axi_bvalid <= 0;
 		    S00_axi_bready <= 0;
 		    S01_axi_bready <= 0;
