@@ -222,7 +222,7 @@ module axi_adder #(
     integer i;
 
     reg [10:0] sampleBuf;
-    reg s_wReady, m_rLast, m_rValid, m_arValid, m_rReady;
+    reg s_wReady, s_wLast, m_rLast, m_rValid, m_arValid, m_rReady;
     reg s_bReady, m_bValid;
     reg sAll_wReady;
 
@@ -232,6 +232,12 @@ module axi_adder #(
    assign S01_axi_wready = s_wReady;
    assign M_axi_arvalid = m_arValid
    assign M_axi_rlast = m_rLast;
+
+   // ??
+   assign S00_axi_wlast = s_wLast;
+   assign S01_axi_wlast = s_wLast;
+   assign S20_axi_wlast = s_wLast;
+   assign S21_axi_wlast = s_wLast;
 
    assign M_axi_rready = m_rReady;
    // if any of the slave axi data streams have valid data, we'll sum them
@@ -260,32 +266,32 @@ module axi_adder #(
             else
                 begin
                     // input tready goes high (tready = 1'b1)
-		   // M_axi_rlast <= S00_axi_wlast + S01_axi_wlast + S20_axi_wlast + S21_axi_wlast;
-
-		    // if any of the slave axi data streams have valid data, we'll sum them
-	            sAll_wValid <= S00_axi_wvalid | S01_axi_wvalid | S20_axi_wvalid | S21_axi_wvalid;
+		    // I don't think this is right but I don't know how the last stuff work
+		    m_rLast <= s_wLast;
 			
-		    if(M_axi_rready && S_axi_wvalid) begin
-			// wvalid is now high (wvalid = 1'b1)
+		    if(m_rReady && sAll_wValid) begin
+		    	// wvalid is now high (wvalid = 1'b1)
                 	M_rvalid <= 1'b1;
 			// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                 	for(i=0; i<samples; i = i+1) begin
 				sampleBuf <= S00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-				+ S01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-				+ S20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-				+ S21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-					
-				// truncate each output sample by 3 bits, then round
-				// if the highest bit of the truncated bits is 1 => round up
-				if (sampleBuf[2] == 1) {
-					M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[10:3] + 1;
-				}
-				// if the highest bit of the truncated bits is 0 => round down
-				else { //if (sampleBuf[2] == 0) {
-					M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[10:3];
-				}
-			    end
+				 + S01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+				 + S20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+				 + S21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 			end
+
+			
+					
+			// truncate each output sample by 3 bits, then round
+			// if the highest bit of the truncated bits is 1 => round up
+			if (sampleBuf[2] == 1) begin
+				M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[10:3] + 1;
+			end
+			// if the highest bit of the truncated bits is 0 => round down
+			else begin //else if (sampleBuf[2] == 0) begin
+				M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[10:3];
+			end
+		     end
             else begin 
                         // invalid data, so output data is set to static value of 0
                         M_axi_rdata <= 256'd0;
