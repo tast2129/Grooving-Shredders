@@ -221,7 +221,7 @@ module axi_adder #(
 
     integer i;
     reg S_axi_wvalid;
-    reg [10:0] sampleBuf;
+    reg [9:0] sampleBuf;
     
     always @(posedge clock)
         begin
@@ -231,56 +231,56 @@ module axi_adder #(
                     M_axi_rdata <= 0;
                     M_axi_rlast <= 0;
 
-		            // asynchronous write
-		            M_axi_arvalid <= 0;
-		            S00_axi_awready <= 0;
-		            S01_axi_awready <= 0;
-		            S20_axi_awready <= 0;
-		            S21_axi_awready <= 0;
+		    // asynchronous write
+		    M_axi_arvalid <= 0;
+		    S00_axi_awready <= 0;
+		    S01_axi_awready <= 0;
+		    S20_axi_awready <= 0;
+		    S21_axi_awready <= 0;
 
-		            // write
-		            M_axi_rvalid <= 0;
-		            S00_axi_wready <= 0;
-		            S01_axi_wready <= 0;
-		            S20_axi_wready <= 0;
-		            S21_axi_wready <= 0;
+		    // write
+		    M_axi_rvalid <= 0;
+		    S00_axi_wready <= 0;
+		    S01_axi_wready <= 0;
+		    S20_axi_wready <= 0;
+		    S21_axi_wready <= 0;
 
-	                // burst
-		            M_axi_bvalid <= 0;
-		            S00_axi_bready <= 0;
-		            S01_axi_bready <= 0;
-		            S20_axi_bready <= 0;
-		            S21_axi_bwready <= 0;
+	            // burst
+		    M_axi_bvalid <= 0;
+		    S00_axi_bready <= 0;
+		    S01_axi_bready <= 0;
+		    S20_axi_bready <= 0;
+		    S21_axi_bwready <= 0;
                 end
             else
                 begin
                     // input tready goes high (tready = 1'b1)
-		            M_axi_rlast <= S00_axi_wlast + S01_axi_wlast + S20_axi_wlast + S21_axi_wlast;
+		    M_axi_rlast <= S00_axi_wlast + S01_axi_wlast + S20_axi_wlast + S21_axi_wlast;
 
-		            // if any of the slave axi data streams have valid data, we'll sum them
-	                S_axi_wvalid <= S00_axi_wvalid | S01_axi_wvalid | S20_axi_wvalid | S21_axi_wvalid;
+		    // if any of the slave axi data streams have valid data, we'll sum them
+	            S_axi_wvalid <= S00_axi_wvalid | S01_axi_wvalid | S20_axi_wvalid | S21_axi_wvalid;
 			
-			if(M_axi_rready && S_axi_wvalid) begin
-				// wvalid is now high (wvalid = 1'b1)
-                M_axi_rvalid <= 1'b1;
-				// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
-                for(i=0; i<samples; i = i+1) begin
-					sampleBuf <= S00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-					+ S01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-					+ S20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-					+ S21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+		    if(M_axi_rready && S_axi_wvalid) begin
+			// wvalid is now high (wvalid = 1'b1)
+                	M_axi_rvalid <= 1'b1;
+			// this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
+                	for(i=0; i<samples; i = i+1) begin
+				sampleBuf <= S00_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+				+ S01_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+				+ S20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+				+ S21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 					
-					// truncate each output sample by 3 bits
-					M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[10:3]; // katie figure out how to round this rather than just floor()-ing it
+				// truncate each output sample by 3 bits
+				M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[9:2]; // katie figure out how to round this rather than just floor()-ing it
 			    end
 			end
             else begin 
                         // invalid data, so output data is set to static value of 0
                         M_axi_rdata <= 256'd0;
 
-			            // output valid(s) should be low
+			// output valid(s) should be low
                         M_axi_rvalid = 0;
-			            M_axi_arvalid = 0;
+			M_axi_arvalid = 0;
             end
         end
      end
