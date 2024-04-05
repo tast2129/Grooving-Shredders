@@ -230,7 +230,7 @@ module axi_adder #(
    assign S01_axi_wready = s_wReady;
    assign S00_axi_wready = s_wReady;
    assign S01_axi_wready = s_wReady;
-   assign M_axi_arvalid = m_arValid
+   assign M_axi_arvalid = m_arValid;
    assign M_axi_rlast = m_rLast;
 
    // ??
