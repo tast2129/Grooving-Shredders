@@ -221,7 +221,7 @@ module axi_adder #(
 
     integer i;
     reg S_axi_wvalid;
-    reg [9:0] sampleBuf;
+    reg [10:0] sampleBuf;
     
     always @(posedge clock)
         begin
@@ -270,8 +270,15 @@ module axi_adder #(
 				+ S20_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
 				+ S21_axi_wdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 					
-				// truncate each output sample by 3 bits
-				M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[9:2]; // katie figure out how to round this rather than just floor()-ing it
+				// truncate each output sample by 3 bits, then round
+				// if the highest bit of the truncated bits is 1 => round up
+				if (sampleBuf[2] == 1) {
+					M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[10:3] + 1;
+				}
+				// if the highest bit of the truncated bits is 0 => round down
+				else { //if (sampleBuf[2] == 0) {
+					M_axi_rdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = sampleBuf[10:3];
+				}
 			    end
 			end
             else begin 
