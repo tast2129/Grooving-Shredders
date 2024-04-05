@@ -226,7 +226,7 @@ module axi_adder #(
         begin
             if (resetn == 1'b0) //~resetn
                 begin
-                    // data out, valid, tread, and tlast should all be 0
+                    // data out, valid, tready, and tlast should all be 0
                     M_axis_rdata <= 0;
                     M_axi_rlast <= 0;
 
