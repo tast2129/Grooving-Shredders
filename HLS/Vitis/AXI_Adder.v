@@ -228,7 +228,7 @@ module axi_adder #(
             if (resetn == 1'b0) //~resetn
                 begin
                     // data out, valid, tready, and tlast should all be 0
-                    M_axis_rdata <= 0;
+                    M_axi_rdata <= 0;
                     M_axi_rlast <= 0;
 
 		            // asynchronous write
