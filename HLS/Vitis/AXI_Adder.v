@@ -297,8 +297,8 @@ module axi_adder #(
                         M_axi_rdata <= 256'd0;
 
 			// output valid(s) should be low
-                        M_axi_rvalid = 0;
-			M_axi_arvalid = 0;
+                        m_rValid = 0;
+			m_arValid = 0;
             end
         end
      end
