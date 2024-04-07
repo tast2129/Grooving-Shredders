@@ -7,8 +7,8 @@ module axis_adder
     parameter SDATA_WIDTH = 128,
     parameter SSAMPLE_WIDTH = 8,
     parameter WEIGHT_WIDTH = 8,
-    parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
-    parameter MDATA_WIDTH = 256     // MSAMPLE_WIDTH * SAMPLES
+    parameter MSAMPLE_WIDTH = 8,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
+    parameter MDATA_WIDTH = 128     // MSAMPLE_WIDTH * SAMPLES
    ) 
     (
     input wire clock,
