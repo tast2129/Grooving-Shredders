@@ -1,5 +1,6 @@
 /* 
- * AXI stream multiplier block taking 128-bit input data and 8-bit beamforming weight to apply to data
+ * AXI stream multiplier and adder block taking 128-bit input data and 8-bit beamforming weight to apply to data
+ *          weighted/multiplied data is written to channel 00
 */
 module axis_adder
   #(
