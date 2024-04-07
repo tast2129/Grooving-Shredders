@@ -1,14 +1,13 @@
 /* 
- * AXI stream multiplier and adder block taking 128-bit input data and 8-bit beamforming weight to apply to data
- *          weighted/multiplied data is written to channel 00
+ * AXI stream multiplier block taking 128-bit input data and 8-bit beamforming weight to apply to data
 */
 module axis_adder
   #(
     parameter SDATA_WIDTH = 128,
     parameter SSAMPLE_WIDTH = 8,
     parameter WEIGHT_WIDTH = 8,
-    parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
-    parameter MDATA_WIDTH = 256     // MSAMPLE_WIDTH * SAMPLES
+    parameter MSAMPLE_WIDTH = 8,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
+    parameter MDATA_WIDTH = 128     // MSAMPLE_WIDTH * SAMPLES
    ) 
     (
     input wire clock,
@@ -120,12 +119,10 @@ module axis_adder
 
     integer i;
 
-    reg dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH+1];
+    reg [SSAMPLE_WIDTH+WEIGHT_WIDTH+1:0]dataBuffer;
     integer roundBit;
 
-    reg dataBuffer_Sum[SSAMPLE_WDTH+3];
-
-    assign roundBit = WEIGHT_WIDTH;
+    reg [SSAMPLE_WIDTH+3:0]dataBuffer_Sum;
     
     always @(posedge clock) begin
         //~resetn
@@ -153,7 +150,7 @@ module axis_adder
         end
         else begin
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
-            if (m00_axis_real_s2mm_tready && s00_real_axis_tvalid && m00_axis_imag_s2mm_tready && s00_imag_axis_tvalid) begin
+            if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m00_axis_real_s2mm_tkeep <= 16'hffff;   m00_axis_imag_s2mm_tkeep <= 16'hffff;
                 m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
@@ -165,22 +162,22 @@ module axis_adder
                     dataBuffer <= bWeight00_real*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight00_imag*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
-                    if (dataBuffer[roundBit] == 0) begin
-                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
+                    if (dataBuffer[WEIGHT_WIDTH] == 0) begin
+                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
-                    else if (dataBuffer[roundBit] == 1) begin
-                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                    else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
+                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
                     dataBuffer <= bWeight00_imag*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight00_real*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
-                    if (dataBuffer[roundBit] == 0) begin
-                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
+                    if (dataBuffer[WEIGHT_WIDTH] == 0) begin
+                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
-                    else if (dataBuffer[roundBit] == 1) begin
+                    else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
                         // what if there is bit overflow here? is this likely enough to plan for an extra bit?
-                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
                 end
             end
@@ -195,7 +192,7 @@ module axis_adder
                 m00_axis_real_s2mm_tkeep <= 0;  m00_axis_imag_s2mm_tkeep <= 0;
             end
             /*------------------------CHANNEL 01 READY/VALID------------------------*/
-            if (m01_axis_real_s2mm_tready && s01_real_axis_tvalid && m01_axis_imag_s2mm_tready && s01_imag_axis_tvalid) begin
+            if (m01_axis_real_s2mm_tready && s01_axis_real_tvalid && m01_axis_imag_s2mm_tready && s01_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m01_axis_real_s2mm_tkeep <= 16'hffff;   m01_axis_imag_s2mm_tkeep <= 16'hffff;
                 m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
@@ -207,22 +204,22 @@ module axis_adder
                     dataBuffer <= bWeight01_real*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight01_imag*s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
-                    if (dataBuffer[roundBit] == 0) begin
-                        m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
+                    if (dataBuffer[WEIGHT_WIDTH] == 0) begin
+                        m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
-                    else if (dataBuffer[roundBit] == 1) begin
-                        m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                    else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
+                        m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
                     dataBuffer <= bWeight01_imag*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight01_real*s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
-                    if (dataBuffer[roundBit] == 0) begin
-                        m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
+                    if (dataBuffer[WEIGHT_WIDTH] == 0) begin
+                        m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
-                    else if (dataBuffer[roundBit] == 1) begin
+                    else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
                         // what if there is bit overflow here? is this likely enough to plan for an extra bit?
-                        m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
                 end
             end
@@ -237,7 +234,7 @@ module axis_adder
                 m01_axis_real_s2mm_tkeep <= 0;  m01_axis_imag_s2mm_tkeep <= 0;
             end
             /*------------------------CHANNEL 20 READY/VALID------------------------*/
-            if (m20_axis_real_s2mm_tready && s20_real_axis_tvalid && m20_axis_imag_s2mm_tready && s20_imag_axis_tvalid) begin
+            if (m20_axis_real_s2mm_tready && s20_axis_real_tvalid && m20_axis_imag_s2mm_tready && s20_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m20_axis_real_s2mm_tkeep <= 16'hffff;   m20_axis_imag_s2mm_tkeep <= 16'hffff;
                 m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
@@ -249,22 +246,22 @@ module axis_adder
                     dataBuffer <= bWeight20_real*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight20_imag*s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
-                    if (dataBuffer[roundBit] == 0) begin
-                        m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
+                    if (dataBuffer[WEIGHT_WIDTH] == 0) begin
+                        m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
-                    else if (dataBuffer[roundBit] == 1) begin
-                        m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                    else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
+                        m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
                     dataBuffer <= bWeight20_imag*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight20_real*s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
-                    if (dataBuffer[roundBit] == 0) begin
-                        m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
+                    if (dataBuffer[WEIGHT_WIDTH] == 0) begin
+                        m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
-                    else if (dataBuffer[roundBit] == 1) begin
+                    else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
                         // what if there is bit overflow here? is this likely enough to plan for an extra bit?
-                        m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
                 end
             end
@@ -292,21 +289,21 @@ module axis_adder
                         + bWeight21_imag*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
                     if (dataBuffer[roundBit] == 0) begin
-                        m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
+                        m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else if (dataBuffer[roundBit] == 1) begin
-                        m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
                     dataBuffer <= bWeight21_imag*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight21_real*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
                     if (dataBuffer[roundBit] == 0) begin
-                        m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
+                        m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else if (dataBuffer[roundBit] == 1) begin
                         // what if there is bit overflow here? is this likely enough to plan for an extra bit?
-                        m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
                 end
             end
@@ -327,8 +324,10 @@ module axis_adder
              *
              * 2. Additionally, the data may be more precise if I round based on how many channels have valid data (that we are summing)
              */
-            if((m00_axis_s2mm_tready && s00_axis_tvalid) || (m01_axis_s2mm_tready && s01_axis_tvalid) ||
-               (m20_axis_s2mm_tready && s20_axis_tvalid) || (m20_axis_s2mm_tready && s00_axis_tvalid)) begin
+            if((m00_axis_real_s2mm_tready && s00_axis_real_tvalid) || (m01_axis_real_s2mm_tready && s01_axis_real_tvalid) ||
+               (m20_axis_real_s2mm_tready && s20_axis_real_tvalid) || (m20_axis_real_s2mm_tready && s00_axis_real_tvalid) ||
+               (m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) || (m01_axis_imag_s2mm_tready && s01_axis_imag_tvalid) ||
+               (m20_axis_imag_s2mm_tready && s20_axis_imag_tvalid) || (m20_axis_imag_s2mm_tready && s00_axis_imag_tvalid)) begin
                 // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
