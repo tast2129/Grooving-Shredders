@@ -15,14 +15,14 @@ module axis_adder
     input wire resetn,
 
     // this will be the multiplication factor for all 16 samples in its channel, should be <1
-    input [WEIGHT_WIDTH:0] bWeight00_real,
-    input [WEIGHT_WIDTH:0] bWeight00_imag,
-    input [WEIGHT_WIDTH:0] bWeight01_real,
-    input [WEIGHT_WIDTH:0] bWeight01_imag,
-    input [WEIGHT_WIDTH:0] bWeight20_real,
-    input [WEIGHT_WIDTH:0] bWeight20_imag,
-    input [WEIGHT_WIDTH:0] bWeight21_real,
-    input [WEIGHT_WIDTH:0] bWeight21_imag,
+    input [WEIGHT_WIDTH-1:0] bWeight00_real,
+    input [WEIGHT_WIDTH-1:0] bWeight00_imag,
+    input [WEIGHT_WIDTH-1:0] bWeight01_real,
+    input [WEIGHT_WIDTH-1:0] bWeight01_imag,
+    input [WEIGHT_WIDTH-1:0] bWeight20_real,
+    input [WEIGHT_WIDTH-1:0] bWeight20_imag,
+    input [WEIGHT_WIDTH-1:0] bWeight21_real,
+    input [WEIGHT_WIDTH-1:0] bWeight21_imag,
     
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
