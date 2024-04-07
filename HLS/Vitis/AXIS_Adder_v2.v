@@ -112,7 +112,7 @@ module axis_adder
     output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m21_axis_imag_s2mm_tkeep,
     output reg m21_axis_imag_s2mm_tlast,
     input wire m21_axis_imag_s2mm_tready,
-    output reg m21_axis_imag_s2mm_tvalid,
+    output reg m21_axis_imag_s2mm_tvalid
     );
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
