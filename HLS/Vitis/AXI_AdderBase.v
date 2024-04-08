@@ -383,7 +383,7 @@ module axi_adder #(
     assign M01_axi_awlock = S01_axi_awlock;
     assign M01_axi_awcache = S01_axi_awcache;
     assign M01_axi_awprot = S01_axi_awprot;
-    assign M01_axi_awregion = S1_axi_awregion;
+    assign M01_axi_awregion = S01_axi_awregion;
     assign M01_axi_awqos = S01_axi_awqos;
     assign M01_axi_awvalid = S01_axi_awvalid;
     assign M01_axi_awready = S01_axi_awready; //zero when reset
