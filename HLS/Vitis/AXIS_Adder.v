@@ -125,10 +125,10 @@ module axis_adder
 
     integer i;
 
-    // we need bit overflow for the following 2's complement arithmetic with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8,
+    // we need bit overflow for the following 2's complement arithmetic:
     //       reg[SSAMPLE_WIDTH] * reg[WEIGHT_WIDTH] + reg2[SSAMPLE_WIDTH] * reg2[WEIGHT_WIDTH] => 
+    // with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8,
     reg [SSAMPLE_WIDTH+WEIGHT_WIDTH+1:0]dataBuffer;
-    integer roundBit;
 
     reg [SSAMPLE_WIDTH-1+3:0]dataBuffer_Sum;
     
@@ -297,20 +297,20 @@ module axis_adder
                     dataBuffer <= bWeight21_real*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight21_imag*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
-                    if (dataBuffer[roundBit] == 0) begin
+                    if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
-                    else if (dataBuffer[roundBit] == 1) begin
+                    else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
                         m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
                     dataBuffer <= bWeight21_imag*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bWeight21_real*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
-                    if (dataBuffer[roundBit] == 0) begin
+                    if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
-                    else if (dataBuffer[roundBit] == 1) begin
+                    else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
                         // what if there is bit overflow here? is this likely enough to plan for an extra bit?
                         m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
