@@ -72,49 +72,49 @@ module axis_adder
 /*=====================================BEGIN OUTPUTS======================================*/
     /*-------------------------Channel00 Output Real & Imag-------------------------*/
     output reg [MDATA_WIDTH-1:0] m00_axis_real_s2mm_tdata,
-    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m00_axis_real_s2mm_tkeep,
+    output reg [(SDATA_WIDTH/8)-1:0] m00_axis_real_s2mm_tkeep,
     output reg m00_axis_real_s2mm_tlast,
     input wire m00_axis_real_s2mm_tready,
     output reg m00_axis_real_s2mm_tvalid,
 
     output reg [MDATA_WIDTH-1:0] m00_axis_imag_s2mm_tdata,
-    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m00_axis_imag_s2mm_tkeep,
+    output reg [(SDATA_WIDTH/8)-1:0] m00_axis_imag_s2mm_tkeep,
     output reg m00_axis_imag_s2mm_tlast,
     input wire m00_axis_imag_s2mm_tready,
     output reg m00_axis_imag_s2mm_tvalid,
     /*-------------------------Channel01 Output Real & Imag-------------------------*/
     output reg [MDATA_WIDTH-1:0] m01_axis_real_s2mm_tdata,
-    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m01_axis_real_s2mm_tkeep,
+    output reg [(SDATA_WIDTH/8)-1:0] m01_axis_real_s2mm_tkeep,
     output reg m01_axis_real_s2mm_tlast,
     input wire m01_axis_real_s2mm_tready,
     output reg m01_axis_real_s2mm_tvalid,
 
     output reg [MDATA_WIDTH-1:0] m01_axis_imag_s2mm_tdata,
-    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m01_axis_imag_s2mm_tkeep,
+    output reg [(SDATA_WIDTH/8)-1:0] m01_axis_imag_s2mm_tkeep,
     output reg m01_axis_imag_s2mm_tlast,
     input wire m01_axis_imag_s2mm_tready,
     output reg m01_axis_imag_s2mm_tvalid,
     /*-------------------------Channel20 Output Real & Imag-------------------------*/
     output reg [MDATA_WIDTH-1:0] m20_axis_real_s2mm_tdata,
-    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m20_axis_real_s2mm_tkeep,
+    output reg [(SDATA_WIDTH/8)-1:0] m20_axis_real_s2mm_tkeep,
     output reg m20_axis_real_s2mm_tlast,
     input wire m20_axis_real_s2mm_tready,
     output reg m20_axis_real_s2mm_tvalid,
 
     output reg [MDATA_WIDTH-1:0] m20_axis_imag_s2mm_tdata,
-    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m20_axis_imag_s2mm_tkeep,
+    output reg [(SDATA_WIDTH/8)-1:0] m20_axis_imag_s2mm_tkeep,
     output reg m20_axis_imag_s2mm_tlast,
     input wire m20_axis_imag_s2mm_tready,
     output reg m20_axis_imag_s2mm_tvalid,
     /*-------------------------Channel21 Output Real & Imag-------------------------*/
     output reg [MDATA_WIDTH-1:0] m21_axis_real_s2mm_tdata,
-    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m21_axis_real_s2mm_tkeep,
+    output reg [(SDATA_WIDTH/8)-1:0] m21_axis_real_s2mm_tkeep,
     output reg m21_axis_real_s2mm_tlast,
     input wire m21_axis_real_s2mm_tready,
     output reg m21_axis_real_s2mm_tvalid,
 
     output reg [MDATA_WIDTH-1:0] m21_axis_imag_s2mm_tdata,
-    output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m21_axis_imag_s2mm_tkeep,
+    output reg [(SDATA_WIDTH/8)-1:0] m21_axis_imag_s2mm_tkeep,
     output reg m21_axis_imag_s2mm_tlast,
     input wire m21_axis_imag_s2mm_tready,
     output reg m21_axis_imag_s2mm_tvalid
