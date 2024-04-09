@@ -125,10 +125,12 @@ module axis_adder
 
     integer i;
 
+    // we need bit overflow for the following 2's complement arithmetic with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8,
+    //       reg[SSAMPLE_WIDTH] * reg[WEIGHT_WIDTH] + reg2[SSAMPLE_WIDTH] * reg2[WEIGHT_WIDTH] => 
     reg [SSAMPLE_WIDTH+WEIGHT_WIDTH+1:0]dataBuffer;
     integer roundBit;
 
-    reg [SSAMPLE_WIDTH+3:0]dataBuffer_Sum;
+    reg [SSAMPLE_WIDTH-1+3:0]dataBuffer_Sum;
     
     always @(posedge clock) begin
         //~resetn
@@ -182,6 +184,7 @@ module axis_adder
                         m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else if (dataBuffer[WEIGHT_WIDTH] == 1) begin
+                        // accounting for overflow if dataBuffer = 19'b1 or dataBuffer = 
                         // what if there is bit overflow here? is this likely enough to plan for an extra bit?
                         m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
