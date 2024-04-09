@@ -357,20 +357,20 @@ module axis_adder
                         + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     if (dataBuffer_Sum[2] == 1'b1) begin // round up
                         // same thing as above- we could overflow here but are we really worried about that?
-                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3 -: MSAMPLE_WIDTH] + 1'b1;
+                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3-1 -: MSAMPLE_WIDTH] + 1'b1;
                     end
                     else begin // round down
-                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3 -: MSAMPLE_WIDTH];
+                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3-1 -: MSAMPLE_WIDTH];
                     end
 
                     dataBuffer_Sum = m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     if (dataBuffer_Sum[2] == 1'b1) begin // round up
                         // same thing as above- we could overflow here but are we really worried about that?
-                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3 -: MSAMPLE_WIDTH] + 1'b1;
+                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3-1 -: MSAMPLE_WIDTH] + 1'b1;
                     end
                     else begin // round down
-                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3 -: MSAMPLE_WIDTH];
+                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3-1 -: MSAMPLE_WIDTH];
                     end
                 end
             end
