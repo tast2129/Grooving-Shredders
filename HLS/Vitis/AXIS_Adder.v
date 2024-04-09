@@ -10,6 +10,7 @@ module axis_adder
     parameter MDATA_WIDTH = 128     // MSAMPLE_WIDTH * SAMPLES
    ) 
     (
+/*======================================BEGIN INPUTS=======================================*/
     input wire clock,
     input wire resetn,
 
@@ -65,6 +66,10 @@ module axis_adder
     output reg s21_axis_imag_tready,
     input wire [SDATA_WIDTH-1:0] s21_axis_imag_tdata, // 16 8-bit samples
     input wire s21_axis_imag_tlast,
+    /*-------------------------Channel21 Input Real & Imag-------------------------*/
+/*=======================================END INPUTS=======================================*/
+
+/*=====================================BEGIN OUTPUTS======================================*/
     /*-------------------------Channel00 Output Real & Imag-------------------------*/
     output reg [MDATA_WIDTH-1:0] m00_axis_real_s2mm_tdata,
     output reg [SDATA_WIDTH/SSAMPLE_WIDTH-1:0] m00_axis_real_s2mm_tkeep,
@@ -113,6 +118,7 @@ module axis_adder
     output reg m21_axis_imag_s2mm_tlast,
     input wire m21_axis_imag_s2mm_tready,
     output reg m21_axis_imag_s2mm_tvalid
+/*======================================END OUTPUTS=======================================*/
     );
 
     integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
