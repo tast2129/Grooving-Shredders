@@ -4,9 +4,9 @@
 module axis_adder
   #(
     parameter SDATA_WIDTH = 128,
-    parameter SSAMPLE_WIDTH = 8,
+    parameter SSAMPLE_WIDTH = 16,
     parameter WEIGHT_WIDTH = 8,
-    parameter MSAMPLE_WIDTH = 8,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
+    parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
     parameter MDATA_WIDTH = 128     // MSAMPLE_WIDTH * SAMPLES
    ) 
     (
@@ -28,17 +28,17 @@ module axis_adder
     /*-------------------------Channel00 Input Real & Imag-------------------------*/
     input wire s00_axis_real_tvalid,
     output reg s00_axis_real_tready,
-    input wire [SDATA_WIDTH-1:0] s00_axis_real_tdata, // 16 8-bit samples
+    input wire [SDATA_WIDTH-1:0] s00_axis_real_tdata, // 8 16-bit samples
     input wire s00_axis_real_tlast,
 
     input wire s00_axis_imag_tvalid,
     output reg s00_axis_imag_tready,
-    input wire [SDATA_WIDTH-1:0] s00_axis_imag_tdata, // 16 8-bit samples
+    input wire [SDATA_WIDTH-1:0] s00_axis_imag_tdata, // 8 16-bit samples
     input wire s00_axis_imag_tlast,
     /*-------------------------Channel01 Input Real & Imag-------------------------*/
     input wire s01_axis_real_tvalid,
     output reg s01_axis_real_tready,
-    input wire [SDATA_WIDTH-1:0] s01_axis_real_tdata, // 16 8-bit samples
+    input wire [SDATA_WIDTH-1:0] s01_axis_real_tdata, // 8 16-bit samples
     input wire s01_axis_real_tlast,
 
     input wire s01_axis_imag_tvalid,
@@ -184,8 +184,8 @@ module axis_adder
             /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m00_axis_real_s2mm_tdata <= 256'd0;
-                m00_axis_imag_s2mm_tdata <= 256'd0;
+                m00_axis_real_s2mm_tdata <= 128'd0;
+                m00_axis_imag_s2mm_tdata <= 128'd0;
 
                 // output valid and output tkeep should be low
                 m00_axis_real_s2mm_tvalid <= 0; m00_axis_imag_s2mm_tvalid <= 0;
@@ -226,8 +226,8 @@ module axis_adder
             /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m01_axis_real_s2mm_tdata <= 256'd0;
-                m01_axis_imag_s2mm_tdata <= 256'd0;
+                m01_axis_real_s2mm_tdata <= 128'd0;
+                m01_axis_imag_s2mm_tdata <= 128'd0;
 
                 // output valid and output tkeep should be low
                 m01_axis_real_s2mm_tvalid <= 0; m01_axis_imag_s2mm_tvalid <= 0;
@@ -268,8 +268,8 @@ module axis_adder
             /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m20_axis_real_s2mm_tdata <= 256'd0;
-                m20_axis_imag_s2mm_tdata <= 256'd0;
+                m20_axis_real_s2mm_tdata <= 128'd0;
+                m20_axis_imag_s2mm_tdata <= 128'd0;
 
                 // output valid and output tkeep should be low
                 m20_axis_real_s2mm_tvalid <= 0; m20_axis_imag_s2mm_tvalid <= 0;
@@ -310,8 +310,8 @@ module axis_adder
             /*----------------------CHANNEL 21 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m21_axis_real_s2mm_tdata <= 256'd0;
-                m21_axis_imag_s2mm_tdata <= 256'd0;
+                m21_axis_real_s2mm_tdata <= 128'd0;
+                m21_axis_imag_s2mm_tdata <= 128'd0;
 
                 // output valid and output tkeep should be low
                 m21_axis_real_s2mm_tvalid <= 0; m21_axis_imag_s2mm_tvalid <= 0;
