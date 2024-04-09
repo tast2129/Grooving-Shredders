@@ -268,8 +268,8 @@ module axis_adder
             /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m20_axis_real_s2mm_tdata <= 128'd0;
-                m20_axis_imag_s2mm_tdata <= 128'd0;
+                m20_axis_real_s2mm_tdata <= 256'd0;
+                m20_axis_imag_s2mm_tdata <= 256'd0;
 
                 // output valid and output tkeep should be low
                 m20_axis_real_s2mm_tvalid <= 0; m20_axis_imag_s2mm_tvalid <= 0;
@@ -310,8 +310,8 @@ module axis_adder
             /*----------------------CHANNEL 21 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m21_axis_real_s2mm_tdata <= 128'd0;
-                m21_axis_imag_s2mm_tdata <= 128'd0;
+                m21_axis_real_s2mm_tdata <= 256'd0;
+                m21_axis_imag_s2mm_tdata <= 256'd0;
 
                 // output valid and output tkeep should be low
                 m21_axis_real_s2mm_tvalid <= 0; m21_axis_imag_s2mm_tvalid <= 0;
