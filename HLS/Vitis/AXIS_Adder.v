@@ -127,10 +127,17 @@ module axis_adder
 
     // we need bit overflow for the following 2's complement arithmetic:
     //       reg[SSAMPLE_WIDTH] * reg[WEIGHT_WIDTH] + reg2[SSAMPLE_WIDTH] * reg2[WEIGHT_WIDTH] => 
-    // with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8,
-    reg [SSAMPLE_WIDTH+WEIGHT_WIDTH+1:0]dataBuffer;
+    //          we need dataBuffer of size SSAMPLE_WIDTH+WEIGHT_WIDTH+1
+    reg [SSAMPLE_WIDTH+WEIGHT_WIDTH+1-1:0]dataBuffer; // with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8, dataBuffer needs 25 bits
 
-    reg [SSAMPLE_WIDTH-1+3:0]dataBuffer_Sum;
+    reg [SSAMPLE_WIDTH+3-1:0]dataBuffer_Sum;
+
+    // pipelining for weights to help pass timing
+    reg [7:0] bw00_re = 8'd0; reg [7:0] bw00_im = 8'd0;
+    reg [7:0] bw01_re = 8'd0; reg [7:0] bw01_im = 8'd0;
+    reg [7:0] bw20_re = 8'd0; reg [7:0] bw20_im = 8'd0;
+    reg [7:0] bw21_re = 8'd0; reg [7:0] bw21_im = 8'd0;
+    
     
     always @(posedge clock) begin
         //~resetn
@@ -157,6 +164,12 @@ module axis_adder
             m21_axis_real_s2mm_tlast = 0;   m21_axis_imag_s2mm_tlast = 0;
         end
         else begin
+            // setting beamforming weight registers for pipelining
+            bw00_re <= bWeight00_real; bw00_im <= bWeight00_imag;
+            bw01_re <= bWeight01_real; bw01_im <= bWeight01_imag;
+            bw20_re <= bWeight20_real; bw20_im <= bWeight20_imag;
+            bw21_re <= bWeight00_real; bw21_im <= bWeight00_imag;
+
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
@@ -167,8 +180,8 @@ module axis_adder
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
-                    dataBuffer <= bWeight00_real*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-                        + bWeight00_imag*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
+                    dataBuffer <= bw00_re*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                        + bw00_im*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
                     if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
@@ -177,8 +190,8 @@ module axis_adder
                         m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
-                    dataBuffer <= bWeight00_imag*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-                        + bWeight00_real*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+                    dataBuffer <= bw00_im*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                        + bw00_re*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
                     if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
@@ -210,8 +223,8 @@ module axis_adder
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
-                    dataBuffer <= bWeight01_real*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-                        + bWeight01_imag*s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
+                    dataBuffer <= bw01_re*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                        + bw01_im*s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
                     if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
@@ -220,8 +233,8 @@ module axis_adder
                         m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
-                    dataBuffer <= bWeight01_imag*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-                        + bWeight01_real*s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+                    dataBuffer <= bw01_im*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                        + bw01_re*s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
                     if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
@@ -252,8 +265,8 @@ module axis_adder
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
-                    dataBuffer <= bWeight20_real*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-                        + bWeight20_imag*s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
+                    dataBuffer <= bw20_re*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                        + bw20_im*s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
                     if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
@@ -262,8 +275,8 @@ module axis_adder
                         m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
-                    dataBuffer <= bWeight20_imag*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-                        + bWeight20_real*s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+                    dataBuffer <= bw20_im*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                        + bw20_re*s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
                     if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
@@ -294,8 +307,8 @@ module axis_adder
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
-                    dataBuffer <= bWeight21_real*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-                        + bWeight21_imag*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
+                    dataBuffer <= bw21_re*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                        + bw21_im*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
                     // rounding real data using bit 8
                     if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
@@ -304,8 +317,8 @@ module axis_adder
                         m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
                     end
 
-                    dataBuffer <= bWeight21_imag*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
-                        + bWeight21_real*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
+                    dataBuffer <= bw21_im*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                        + bw21_re*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     // rounding imaginary data using bit 8
                     if (dataBuffer[WEIGHT_WIDTH] == 0) begin
                         m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
