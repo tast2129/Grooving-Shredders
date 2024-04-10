@@ -402,8 +402,11 @@ module axis_adder
                     dataBuffer_SumRe <= m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     if (dataBuffer_SumRe[2] == 1'b1) begin // round up
-                        // same thing as above- we could overflow here but are we really worried about that?
-                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer_SumRe[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH])
+                            16'hFFFF: m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
                     else begin // round down
                         m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH];
@@ -412,8 +415,11 @@ module axis_adder
                     dataBuffer_SumIm <= m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     if (dataBuffer_SumIm[2] == 1'b1) begin // round up
-                        // same thing as above- we could overflow here but are we really worried about that?
-                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer_SumIm[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH])
+                            16'hFFFF: m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
                     else begin // round down
                         m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH];
