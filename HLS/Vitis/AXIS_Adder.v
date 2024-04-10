@@ -135,7 +135,8 @@ module axis_adder
     reg [SSAMPLE_WIDTH+WEIGHT_WIDTH:0]dataBuffer21_re;  reg [SSAMPLE_WIDTH+WEIGHT_WIDTH:0]dataBuffer21_im;
 
     // reg [SSAMPLE_WIDTH+3-1:0]dataBuffer_Sum;
-    reg [SSAMPLE_WIDTH+2:0]dataBuffer_Sum;
+    reg [SSAMPLE_WIDTH+2:0]dataBuffer_SumRe;
+    reg [SSAMPLE_WIDTH+2:0]dataBuffer_SumIm;
 
     // pipelining for weights to help pass timing
     reg [7:0] bw00_re = 8'd0; reg [7:0] bw00_im = 8'd0;
@@ -358,24 +359,24 @@ module axis_adder
                 // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
-                    dataBuffer_Sum = m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                    dataBuffer_SumRe <= m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
-                    if (dataBuffer_Sum[2] == 1'b1) begin // round up
+                    if (dataBuffer_SumRe[2] == 1'b1) begin // round up
                         // same thing as above- we could overflow here but are we really worried about that?
-                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3-1 -: MSAMPLE_WIDTH] + 1'b1;
+                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH] + 1'b1;
                     end
                     else begin // round down
-                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3-1 -: MSAMPLE_WIDTH];
+                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH];
                     end
 
-                    dataBuffer_Sum = m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                    dataBuffer_SumIm <= m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
-                    if (dataBuffer_Sum[2] == 1'b1) begin // round up
+                    if (dataBuffer_SumIm[2] == 1'b1) begin // round up
                         // same thing as above- we could overflow here but are we really worried about that?
-                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3-1 -: MSAMPLE_WIDTH] + 1'b1;
+                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH] + 1'b1;
                     end
                     else begin // round down
-                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] = dataBuffer_Sum[MSAMPLE_WIDTH+3-1 -: MSAMPLE_WIDTH];
+                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[MSAMPLE_WIDTH+2 -: MSAMPLE_WIDTH];
                     end
                 end
             end
