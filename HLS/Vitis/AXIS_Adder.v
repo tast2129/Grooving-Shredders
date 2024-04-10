@@ -170,6 +170,11 @@ module axis_adder
             m21_axis_real_s2mm_tlast = 1'b0;   m21_axis_imag_s2mm_tlast = 1'b0;
         end
         else begin
+            m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;    m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
+            m01_axis_real_s2mm_tlast <= s01_axis_real_tlast;    m01_axis_imag_s2mm_tlast <= s01_axis_imag_tlast;
+            m20_axis_real_s2mm_tlast <= s20_axis_real_tlast;    m20_axis_imag_s2mm_tlast <= s20_axis_imag_tlast;
+            m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
+
             // setting beamforming weight registers for pipelining
             bw00_re <= bWeight00_real; bw00_im <= bWeight00_imag;
             bw01_re <= bWeight01_real; bw01_im <= bWeight01_imag;
