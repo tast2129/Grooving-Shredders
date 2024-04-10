@@ -200,7 +200,11 @@ module axis_adder
                         m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else begin // if (dataBuffer[WEIGHT_WIDTH] == 1'b1) 
-                        m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer00_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH])
+                            16'hFFFF: m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
 
                     dataBuffer00_im <= bw00_im*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
@@ -210,9 +214,11 @@ module axis_adder
                         m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else begin // if (dataBuffer[WEIGHT_WIDTH] == 1'b1) 
-                        // accounting for overflow if dataBuffer = 19'b1 or dataBuffer = 
-                        // what if there is bit overflow here? is this likely enough to plan for an extra bit?
-                        m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer00_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH])
+                            16'hFFFF: m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
                 end
             end
@@ -246,7 +252,11 @@ module axis_adder
                         m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else begin // if (dataBuffer[WEIGHT_WIDTH] == 1'b1) 
-                        m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer01_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH])
+                            16'hFFFF: m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
 
                     dataBuffer01_im <= bw01_im*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
@@ -256,8 +266,11 @@ module axis_adder
                         m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else begin // if (dataBuffer[WEIGHT_WIDTH] == 1'b1)
-                        // what if there is bit overflow here? is this likely enough to plan for an extra bit?
-                        m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer01_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH])
+                            16'hFFFF: m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
                 end
             end
@@ -290,7 +303,11 @@ module axis_adder
                         m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else begin // if (dataBuffer[WEIGHT_WIDTH] == 1'b1)
-                        m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer20_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH])
+                            16'hFFFF: m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
 
                     dataBuffer20_im <= bw20_im*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
@@ -300,8 +317,11 @@ module axis_adder
                         m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else begin // if (dataBuffer[WEIGHT_WIDTH] == 1)
-                        // what if there is bit overflow here? is this likely enough to plan for an extra bit?
-                        m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer20_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH])
+                            16'hFFFF: m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
                 end
             end
@@ -334,7 +354,11 @@ module axis_adder
                         m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else begin // if (dataBuffer[WEIGHT_WIDTH] == 1'b1) 
-                        m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer21_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH])
+                            16'hFFFF: m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_re[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
 
                     dataBuffer21_im <= bw21_im*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
@@ -344,8 +368,11 @@ module axis_adder
                         m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH];
                     end
                     else begin // if (dataBuffer[WEIGHT_WIDTH] == 1'b1)
-                        // what if there is bit overflow here? is this likely enough to plan for an extra bit?
-                        m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        case (dataBuffer21_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH])
+                            16'hFFFF: m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hFFFF;
+                            16'hEFFF: m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= 16'hEFFF;
+                            default:  m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_im[SSAMPLE_WIDTH+WEIGHT_WIDTH -: SSAMPLE_WIDTH] + 1'b1;
+                        endcase
                     end
                 end
             end
@@ -367,10 +394,8 @@ module axis_adder
              *
              * 2. Additionally, the data may be more precise if I round based on how many channels have valid data (that we are summing)
              */
-            if((m00_axis_real_s2mm_tready && s00_axis_real_tvalid) || (m01_axis_real_s2mm_tready && s01_axis_real_tvalid) ||
-               (m20_axis_real_s2mm_tready && s20_axis_real_tvalid) || (m20_axis_real_s2mm_tready && s00_axis_real_tvalid) ||
-               (m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) || (m01_axis_imag_s2mm_tready && s01_axis_imag_tvalid) ||
-               (m20_axis_imag_s2mm_tready && s20_axis_imag_tvalid) || (m20_axis_imag_s2mm_tready && s00_axis_imag_tvalid)) begin
+            if((s00_axis_real_tready && s00_axis_imag_tready) || (s01_axis_real_tready && s01_axis_imag_tready)  ||
+               (s20_axis_real_tready && s20_axis_imag_tready) || (s21_axis_real_tready && s21_axis_imag_tready)) begin
                 // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
