@@ -170,6 +170,11 @@ module axis_adder
             m21_axis_real_s2mm_tlast = 1'b0;   m21_axis_imag_s2mm_tlast = 1'b0;
         end
         else begin
+            
+            s00_axis_real_tready = 1'b1;       s00_axis_imag_tready = 1'b1;
+            s01_axis_real_tready = 1'b1;       s01_axis_imag_tready = 1'b1;
+            s20_axis_real_tready = 1'b1;       s20_axis_imag_tready = 1'b1;
+            s21_axis_real_tready = 1'b1;       s21_axis_imag_tready = 1'b1;
 
             m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;    m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
             m01_axis_real_s2mm_tlast <= s01_axis_real_tlast;    m01_axis_imag_s2mm_tlast <= s01_axis_imag_tlast;
@@ -184,7 +189,7 @@ module axis_adder
 
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
-                s00_axis_real_tready = 1'b1;       s00_axis_imag_tready = 1'b1;
+                //s00_axis_real_tready = 1'b1;       s00_axis_imag_tready = 1'b1;
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m00_axis_real_s2mm_tkeep <= 16'hffff;   m00_axis_imag_s2mm_tkeep <= 16'hffff;
                 m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
@@ -224,7 +229,7 @@ module axis_adder
             end
             /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
             else begin 
-                s00_axis_real_tready = 1'b0;       s00_axis_imag_tready = 1'b0;
+                //s00_axis_real_tready = 1'b0;       s00_axis_imag_tready = 1'b0;
 
                 // invalid data, so output data is set to static value of 0
                 m00_axis_real_s2mm_tdata <= 128'b0;
@@ -236,7 +241,7 @@ module axis_adder
             end
             /*------------------------CHANNEL 01 READY/VALID------------------------*/
             if (m01_axis_real_s2mm_tready && s01_axis_real_tvalid && m01_axis_imag_s2mm_tready && s01_axis_imag_tvalid) begin
-                s01_axis_real_tready = 1'b1;       s01_axis_imag_tready = 1'b1;
+                //s01_axis_real_tready = 1'b1;       s01_axis_imag_tready = 1'b1;
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m01_axis_real_s2mm_tkeep <= 16'hffff;   m01_axis_imag_s2mm_tkeep <= 16'hffff;
                 m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
@@ -276,7 +281,7 @@ module axis_adder
             end
             /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
             else begin 
-                s01_axis_real_tready = 1'b0;       s01_axis_imag_tready = 1'b0;
+                //s01_axis_real_tready = 1'b0;       s01_axis_imag_tready = 1'b0;
                 // invalid data, so output data is set to static value of 0
                 m01_axis_real_s2mm_tdata <= 128'b0;
                 m01_axis_imag_s2mm_tdata <= 128'b0;
@@ -287,7 +292,7 @@ module axis_adder
             end
             /*------------------------CHANNEL 20 READY/VALID------------------------*/
             if (m20_axis_real_s2mm_tready && s20_axis_real_tvalid && m20_axis_imag_s2mm_tready && s20_axis_imag_tvalid) begin
-                s20_axis_real_tready = 1'b1;       s20_axis_imag_tready = 1'b1;
+                //s20_axis_real_tready = 1'b1;       s20_axis_imag_tready = 1'b1;
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m20_axis_real_s2mm_tkeep <= 16'hffff;   m20_axis_imag_s2mm_tkeep <= 16'hffff;
                 m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
@@ -327,7 +332,7 @@ module axis_adder
             end
             /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
             else begin 
-                s20_axis_real_tready = 1'b0;       s20_axis_imag_tready = 1'b0;
+                //s20_axis_real_tready = 1'b0;       s20_axis_imag_tready = 1'b0;
                 // invalid data, so output data is set to static value of 0
                 m20_axis_real_s2mm_tdata <= 128'b0;
                 m20_axis_imag_s2mm_tdata <= 128'b0;
@@ -338,7 +343,7 @@ module axis_adder
             end
             /*------------------------CHANNEL 21 READY/VALID------------------------*/
             if (m21_axis_real_s2mm_tready && s21_axis_real_tvalid && m21_axis_imag_s2mm_tready && s21_axis_imag_tvalid) begin
-                s21_axis_real_tready = 1'b1;       s21_axis_imag_tready = 1'b1;
+                //s21_axis_real_tready = 1'b1;       s21_axis_imag_tready = 1'b1;
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m21_axis_real_s2mm_tkeep <= 16'hffff;   m21_axis_imag_s2mm_tkeep <= 16'hffff;
                 m21_axis_real_s2mm_tvalid <= 1'b1;      m21_axis_imag_s2mm_tvalid <= 1'b1;
@@ -378,7 +383,7 @@ module axis_adder
             end
             /*----------------------CHANNEL 21 NOT READY/VALID----------------------*/
             else begin 
-                s21_axis_real_tready = 1'b0;       s21_axis_imag_tready = 1'b0;
+                //s21_axis_real_tready = 1'b0;       s21_axis_imag_tready = 1'b0;
                 // invalid data, so output data is set to static value of 0
                 m21_axis_real_s2mm_tdata <= 128'b0;
                 m21_axis_imag_s2mm_tdata <= 128'b0;
