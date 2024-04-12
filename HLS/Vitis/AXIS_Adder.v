@@ -7,7 +7,9 @@ module axis_adder
     parameter SSAMPLE_WIDTH = 16,
     parameter WEIGHT_WIDTH = 8,
     parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
-    parameter MDATA_WIDTH = 128     // MSAMPLE_WIDTH * SAMPLES
+    parameter MDATA_WIDTH = 128,     // MSAMPLE_WIDTH * SAMPLES
+    parameter bufferWidth = SSAMPLE_WIDTH+WEIGHT_WIDTH,
+    parameter bufferWidth_Sum = SSAMPLE_WIDTH+2
    ) 
     (
 /*======================================BEGIN INPUTS=======================================*/
@@ -121,24 +123,27 @@ module axis_adder
 /*======================================END OUTPUTS=======================================*/
     );
 
-    integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
-    integer bufferWidth = SSAMPLE_WIDTH+WEIGHT_WIDTH;
-    integer bufferWidth_Sum = SSAMPLE_WIDTH+2;
-
     integer i;
+    
+    integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
 
     // we need bit overflow for the following 2's complement arithmetic:
     //       reg[SSAMPLE_WIDTH] * reg[WEIGHT_WIDTH] + reg2[SSAMPLE_WIDTH] * reg2[WEIGHT_WIDTH] => 
     //          we need dataBuffer of size SSAMPLE_WIDTH+WEIGHT_WIDTH+1
     // reg [SSAMPLE_WIDTH+WEIGHT_WIDTH+1-1:0]dataBuffer; // with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8, dataBuffer needs 25 bits
-    reg [bufferWidth*samples:0]dataBuffer00_re = 0; reg [bufferWidth*samples:0]dataBuffer00_im = 0;
-    reg [bufferWidth*samples:0]dataBuffer01_re = 0; reg [bufferWidth*samples:0]dataBuffer01_im = 0;
-    reg [bufferWidth*samples:0]dataBuffer20_re = 0; reg [bufferWidth*samples:0]dataBuffer20_im = 0;
-    reg [bufferWidth*samples:0]dataBuffer21_re = 0; reg [bufferWidth*samples:0]dataBuffer21_im = 0;
+    reg [(SSAMPLE_WIDTH+WEIGHT_WIDTH)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer00_re = 0; 
+    reg [(SSAMPLE_WIDTH+WEIGHT_WIDTH)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer00_im = 0;
+    reg [(SSAMPLE_WIDTH+WEIGHT_WIDTH)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer01_re = 0; 
+    reg [(SSAMPLE_WIDTH+WEIGHT_WIDTH)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer01_im = 0;
+    reg [(SSAMPLE_WIDTH+WEIGHT_WIDTH)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer20_re = 0; 
+    reg [(SSAMPLE_WIDTH+WEIGHT_WIDTH)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer20_im = 0;
+    reg [(SSAMPLE_WIDTH+WEIGHT_WIDTH)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer21_re = 0; 
+    reg [(SSAMPLE_WIDTH+WEIGHT_WIDTH)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer21_im = 0;
+
 
     // reg [SSAMPLE_WIDTH+3-1:0]dataBuffer_Sum;
-    reg [bufferWidth_Sum*samples:0]dataBuffer_SumRe = 0;
-    reg [bufferWidth_Sum*samples:0]dataBuffer_SumIm = 0;
+    reg [(SSAMPLE_WIDTH+2)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer_SumRe = 0;
+    reg [(SSAMPLE_WIDTH+2)*SDATA_WIDTH/SSAMPLE_WIDTH:0]dataBuffer_SumIm = 0;
 
     // pipelining for weights to help pass timing
     reg [7:0] bw00_re = 8'd0; reg [7:0] bw00_im = 8'd0;
