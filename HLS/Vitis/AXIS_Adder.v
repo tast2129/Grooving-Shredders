@@ -139,10 +139,13 @@ module axis_adder
     reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer21_re = 0; 
     reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer21_im = 0;
 
-
     // reg [((SSAMPLE_WIDTH+3)-1)*SAMPLES:0]dataBuffer_Sum;
     reg [BUFFER_WIDTH_SUM*SAMPLES:0]dataBuffer_SumRe = 0;
     reg [BUFFER_WIDTH_SUM*SAMPLES:0]dataBuffer_SumIm = 0;
+
+    // pipelining for channel00 because it's the channel we're writing the summed & weighted data to
+    reg [MDATA_WIDTH-1:0]m00_tdata_real; reg [MDATA_WIDTH-1:0]m00_tdata_imag;
+
 
     // pipelining for weights to help pass timing
     reg [7:0] bw00_re = 8'd0; reg [7:0] bw00_im = 8'd0;
@@ -207,13 +210,13 @@ module axis_adder
                         + bw00_im*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
 
                     // truncating data sample
-                    m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_re[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
+                    m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_re[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
 
                     dataBuffer00_im[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw00_im*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw00_re*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 
                     // truncating data sample
-                    m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_im[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
+                    m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_im[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
                 end
             end
             /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
@@ -326,23 +329,18 @@ module axis_adder
                 m21_axis_real_s2mm_tkeep <= 1'b0;  m21_axis_imag_s2mm_tkeep <= 1'b0;
             end
 
-            /* 1. This implementation of the Adder assumes that if one channel has valid data, so do the rest of the channels
-             * The data it produces should be accurate, but given how I'm rounding the data, the firmware may be faster
-             * and more precise if I only sum the data if two or more channels have valid data.
-             *
-             * 2. Additionally, the data may be more precise if I round based on how many channels have valid data (that we are summing)
-             */
+            // If any of the channels have valid data, sum all four
             if((s00_axis_real_tready && s00_axis_imag_tready) || (s01_axis_real_tready && s01_axis_imag_tready)  ||
                (s20_axis_real_tready && s20_axis_imag_tready) || (s21_axis_real_tready && s21_axis_imag_tready)) begin
                 // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
-                    dataBuffer_SumRe[i*BUFFER_WIDTH_SUM +: BUFFER_WIDTH_SUM] <= m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                    dataBuffer_SumRe[i*BUFFER_WIDTH_SUM +: BUFFER_WIDTH_SUM] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     
                     m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[i*BUFFER_WIDTH_SUM +: MSAMPLE_WIDTH];
 
-                    dataBuffer_SumIm[i*BUFFER_WIDTH_SUM +: BUFFER_WIDTH_SUM] <= m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                    dataBuffer_SumIm[i*BUFFER_WIDTH_SUM +: BUFFER_WIDTH_SUM] <= m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     
                     m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*BUFFER_WIDTH_SUM +: MSAMPLE_WIDTH];
