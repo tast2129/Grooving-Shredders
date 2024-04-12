@@ -203,7 +203,7 @@ module axis_adder
                 m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<samples; i = i+1) begin
+                for(i=0; i<SAMPLES; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
                     dataBuffer00_re[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw00_re*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
@@ -236,7 +236,7 @@ module axis_adder
                 m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<samples; i = i+1) begin
+                for(i=0; i<SAMPLES; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
                     dataBuffer01_re[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw01_re*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
@@ -269,7 +269,7 @@ module axis_adder
                 m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<samples; i = i+1) begin
+                for(i=0; i<SAMPLES; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
                     dataBuffer20_re[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw20_re*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
@@ -302,7 +302,7 @@ module axis_adder
                 m21_axis_real_s2mm_tvalid <= 1'b1;      m21_axis_imag_s2mm_tvalid <= 1'b1;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<samples; i = i+1) begin
+                for(i=0; i<sSAMPLES; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
                     dataBuffer21_re[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw21_re*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
@@ -333,7 +333,7 @@ module axis_adder
             if((s00_axis_real_tready && s00_axis_imag_tready) || (s01_axis_real_tready && s01_axis_imag_tready)  ||
                (s20_axis_real_tready && s20_axis_imag_tready) || (s21_axis_real_tready && s21_axis_imag_tready)) begin
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<samples; i = i+1) begin
+                for(i=0; i<SAMPLES; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     dataBuffer_SumRe[i*BUFFER_WIDTH_SUM +: BUFFER_WIDTH_SUM] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
