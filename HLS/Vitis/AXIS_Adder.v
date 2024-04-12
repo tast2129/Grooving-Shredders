@@ -7,7 +7,10 @@ module axis_adder
     parameter SSAMPLE_WIDTH = 16,
     parameter WEIGHT_WIDTH = 8,
     parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
-    parameter MDATA_WIDTH = 128     // MSAMPLE_WIDTH * SAMPLES
+    parameter MDATA_WIDTH = 128,     // MSAMPLE_WIDTH * SAMPLES
+    parameter BUFFER_WIDTH = SSAMPLE_WIDTH+WEIGHT_WIDTH,
+    parameter BUFFER_WIDTH_SUM = SSAMPLE_WIDTH+2,
+    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH
    ) 
     (
 /*======================================BEGIN INPUTS=======================================*/
@@ -121,24 +124,25 @@ module axis_adder
 /*======================================END OUTPUTS=======================================*/
     );
 
-    integer samples = SDATA_WIDTH/SSAMPLE_WIDTH;
-    integer bufferWidth = SSAMPLE_WIDTH+WEIGHT_WIDTH;
-    integer bufferWidth_Sum = SSAMPLE_WIDTH+2;
-
     integer i;
 
     // we need bit overflow for the following 2's complement arithmetic:
     //       reg[SSAMPLE_WIDTH] * reg[WEIGHT_WIDTH] + reg2[SSAMPLE_WIDTH] * reg2[WEIGHT_WIDTH] => 
-    //          we need dataBuffer of size SSAMPLE_WIDTH+WEIGHT_WIDTH+1
-    // reg [SSAMPLE_WIDTH+WEIGHT_WIDTH+1-1:0]dataBuffer; // with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8, dataBuffer needs 25 bits
-    reg [bufferWidth*samples:0]dataBuffer00_re = 0; reg [bufferWidth*samples:0]dataBuffer00_im = 0;
-    reg [bufferWidth*samples:0]dataBuffer01_re = 0; reg [bufferWidth*samples:0]dataBuffer01_im = 0;
-    reg [bufferWidth*samples:0]dataBuffer20_re = 0; reg [bufferWidth*samples:0]dataBuffer20_im = 0;
-    reg [bufferWidth*samples:0]dataBuffer21_re = 0; reg [bufferWidth*samples:0]dataBuffer21_im = 0;
+    //          we need dataBuffer of size SSAMPLE_WIDTH+WEIGHT_WIDTH+1 (per sample)
+    // reg [((SSAMPLE_WIDTH+WEIGHT_WIDTH+1)-1)*SAMPLES:0]dataBuffer; // with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8, dataBuffer needs 25 bits * number of samples
+    reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer00_re = 0; 
+    reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer00_im = 0;
+    reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer01_re = 0; 
+    reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer01_im = 0;
+    reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer20_re = 0; 
+    reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer20_im = 0;
+    reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer21_re = 0; 
+    reg [BUFFER_WIDTH*SAMPLES:0]dataBuffer21_im = 0;
 
-    // reg [SSAMPLE_WIDTH+3-1:0]dataBuffer_Sum;
-    reg [bufferWidth_Sum*samples:0]dataBuffer_SumRe = 0;
-    reg [bufferWidth_Sum*samples:0]dataBuffer_SumIm = 0;
+
+    // reg [((SSAMPLE_WIDTH+3)-1)*SAMPLES:0]dataBuffer_Sum;
+    reg [BUFFER_WIDTH_SUM*SAMPLES:0]dataBuffer_SumRe = 0;
+    reg [BUFFER_WIDTH_SUM*SAMPLES:0]dataBuffer_SumIm = 0;
 
     // pipelining for weights to help pass timing
     reg [7:0] bw00_re = 8'd0; reg [7:0] bw00_im = 8'd0;
@@ -200,17 +204,17 @@ module axis_adder
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
-                    dataBuffer00_re[i*bufferWidth +: bufferWidth] <= bw00_re*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                    dataBuffer00_re[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw00_re*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw00_im*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
 
                     // truncating data sample
-                    m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_re[i*bufferWidth +: MSAMPLE_WIDTH];
+                    m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_re[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
 
-                    dataBuffer00_im[i*bufferWidth +: bufferWidth] <= bw00_im*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                    dataBuffer00_im[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw00_im*s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw00_re*s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 
                     // truncating data sample
-                    m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_im[i*bufferWidth +: MSAMPLE_WIDTH];
+                    m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer00_im[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
                 end
             end
             /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
@@ -236,17 +240,17 @@ module axis_adder
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
-                    dataBuffer01_re[i*bufferWidth +: bufferWidth] <= bw01_re*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                    dataBuffer01_re[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw01_re*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw01_im*s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
 
                     // truncating data sample
-                    m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_re[i*bufferWidth +: MSAMPLE_WIDTH];
+                    m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_re[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
 
-                    dataBuffer01_im[i*bufferWidth +: bufferWidth] <= bw01_im*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                    dataBuffer01_im[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw01_im*s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw01_re*s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 
                     // truncating data sample
-                    m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_im[i*bufferWidth +: MSAMPLE_WIDTH];
+                    m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer01_im[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
                 end
             end
             /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
@@ -271,17 +275,17 @@ module axis_adder
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
-                    dataBuffer20_re[i*bufferWidth +: bufferWidth] <= bw20_re*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                    dataBuffer20_re[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw20_re*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw20_im*s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
 
                     // truncating data sample
-                    m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_re[i*bufferWidth +: MSAMPLE_WIDTH];
+                    m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_re[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
 
-                    dataBuffer20_im[i*bufferWidth +: bufferWidth] <= bw20_im*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                    dataBuffer20_im[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw20_im*s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw20_re*s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 
                     // truncating data sample
-                    m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_im[i*bufferWidth +: MSAMPLE_WIDTH];
+                    m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer20_im[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
                 end
             end
             /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
@@ -306,17 +310,17 @@ module axis_adder
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     // multiply by appropriate weight, accounting for complex/real parts of weight
-                    dataBuffer21_re[i*bufferWidth +: bufferWidth] <= bw21_re*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                    dataBuffer21_re[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw21_re*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw21_im*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]; 
 
                     // truncating data sample
-                    m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_re[i*bufferWidth +: MSAMPLE_WIDTH];
+                    m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_re[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
 
-                    dataBuffer21_im[i*bufferWidth +: bufferWidth] <= bw21_im*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
+                    dataBuffer21_im[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= bw21_im*s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]
                         + bw21_re*s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
 
                     // truncating data sample
-                    m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_im[i*bufferWidth +: MSAMPLE_WIDTH];
+                    m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer21_im[i*BUFFER_WIDTH +: MSAMPLE_WIDTH];
                 end
             end
             /*----------------------CHANNEL 21 NOT READY/VALID----------------------*/
@@ -342,15 +346,15 @@ module axis_adder
                 // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
-                    dataBuffer_SumRe[i*bufferWidth_Sum +: bufferWidth_Sum] <= m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                    dataBuffer_SumRe[i*BUFFER_WIDTH_SUM +: BUFFER_WIDTH_SUM] <= m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     
-                    m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[i*bufferWidth_Sum +: MSAMPLE_WIDTH];
+                    m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[i*BUFFER_WIDTH_SUM +: MSAMPLE_WIDTH];
 
-                    dataBuffer_SumIm[i*bufferWidth_Sum +: bufferWidth_Sum] <= m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                    dataBuffer_SumIm[i*BUFFER_WIDTH_SUM +: BUFFER_WIDTH_SUM] <= m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                         + m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     
-                    m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*bufferWidth_Sum +: MSAMPLE_WIDTH];
+                    m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*BUFFER_WIDTH_SUM +: MSAMPLE_WIDTH];
                 end
             end
          end
