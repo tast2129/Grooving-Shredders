@@ -332,7 +332,7 @@ module axis_adder
             // If any of the channels have valid data, sum all four
             if((s00_axis_real_tready && s00_axis_imag_tready) || (s01_axis_real_tready && s01_axis_imag_tready)  ||
                (s20_axis_real_tready && s20_axis_imag_tready) || (s21_axis_real_tready && s21_axis_imag_tready)) begin
-                // this for loop multiplies every eight bits by bWeights (it'll loop 16 times- 1 time per sample in tdata)
+                // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<samples; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     dataBuffer_SumRe[i*BUFFER_WIDTH_SUM +: BUFFER_WIDTH_SUM] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
