@@ -136,8 +136,6 @@ module axis_adder
     reg [bufferWidth*samples:0]dataBuffer20_re = 0; reg [bufferWidth*samples:0]dataBuffer20_im = 0;
     reg [bufferWidth*samples:0]dataBuffer21_re = 0; reg [bufferWidth*samples:0]dataBuffer21_im = 0;
 
-    reg [MDATA_WIDTH-1:0]m00_tdataBuffer_re = 0;    reg [MDATA_WIDTH-1:0]m00_tdataBuffer_im = 0;
-
     // reg [SSAMPLE_WIDTH+3-1:0]dataBuffer_Sum;
     reg [bufferWidth_Sum*samples:0]dataBuffer_SumRe = 0;
     reg [bufferWidth_Sum*samples:0]dataBuffer_SumIm = 0;
