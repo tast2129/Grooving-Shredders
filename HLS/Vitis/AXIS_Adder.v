@@ -172,10 +172,15 @@ module axis_adder
     reg [BUFFER_WIDTH-1:0] bw20_re = 0;  reg [BUFFER_WIDTH-1:0] bw20_im = 0;
     reg [BUFFER_WIDTH-1:0] bw21_re = 0;  reg [BUFFER_WIDTH-1:0] bw21_im = 0;
 
+<<<<<<< HEAD
     reg [WEIGHT_WIDTH-1:0] spongeyBob = 0;
     reg [SSAMPLE_WIDTH-1:0] patrickStar = 0;
     reg [BUFFER_WIDTH-1:0] garyTheSnail = 0;
     reg [BUFFER_WIDTH-1:0] sandyCheeks = 0;
+=======
+    reg [SSAMPLE_WIDTH-1:0] spongeyBob = 0;
+    reg signed [BUFFER_WIDTH-1:0] garyTheSnail = 0;
+>>>>>>> 663bda9a92b1f0c0c94f94047796f92f15d4e89a
     
     always @(posedge clock) begin
         //~resetn
