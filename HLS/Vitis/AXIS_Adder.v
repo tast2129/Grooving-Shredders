@@ -18,14 +18,14 @@ module axis_adder
     input wire resetn,
 
     // this will be the multiplication factor for all 16 samples in its channel, should be <1
-    input signed [WEIGHT_WIDTH-1:0] bWeight00_real, // unsigned, 8-bit integer
-    input signed [WEIGHT_WIDTH-1:0] bWeight00_imag, // unsigned, 8-bit integer
-    input signed [WEIGHT_WIDTH-1:0] bWeight01_real, // unsigned, 8-bit integer
-    input signed [WEIGHT_WIDTH-1:0] bWeight01_imag, // unsigned, 8-bit integer
-    input signed [WEIGHT_WIDTH-1:0] bWeight20_real, // unsigned, 8-bit integer
-    input signed [WEIGHT_WIDTH-1:0] bWeight20_imag, // unsigned, 8-bit integer
-    input signed [WEIGHT_WIDTH-1:0] bWeight21_real, // unsigned, 8-bit integer
-    input signed [WEIGHT_WIDTH-1:0] bWeight21_imag, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight00_real, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight00_imag, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight01_real, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight01_imag, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight20_real, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight20_imag, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight21_real, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight21_imag, // unsigned, 8-bit integer
     
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
@@ -127,9 +127,13 @@ module axis_adder
     integer i;
 
     // we need bit overflow for the following 2's complement arithmetic:
-    //       reg[SSAMPLE_WIDTH] * reg[WEIGHT_WIDTH] + reg2[SSAMPLE_WIDTH] * reg2[WEIGHT_WIDTH] => 
-    //          we need dataBuffer of size SSAMPLE_WIDTH+WEIGHT_WIDTH+1 (per sample)
-    // reg [((SSAMPLE_WIDTH+WEIGHT_WIDTH+1)-1)*SAMPLES:0]dataBuffer; // with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8, dataBuffer needs 25 bits * number of samples
+    //       reg[SSAMPLE_WIDTH] * reg[WEIGHT_WIDTH],  reg2[SSAMPLE_WIDTH] * reg2[WEIGHT_WIDTH]
+    //          we need dataBuffer of size SSAMPLE_WIDTH+WEIGHT_WIDTH (per sample)
+    // reg [((SSAMPLE_WIDTH+WEIGHT_WIDTH)-1)*SAMPLES:0]dataBuffer; // with SSAMPLE_WIDTH=16 and WEIGHT_WIDTH=8, dataBuffer needs 24 bits * number of samples
+    reg [(BUFFER_WIDTH*SAMPLES)-1:0]s00_tdata_real = 0; reg [(BUFFER_WIDTH*SAMPLES)-1:0]s00_tdata_imag = 0;
+    reg [(BUFFER_WIDTH*SAMPLES)-1:0]s01_tdata_real = 0; reg [(BUFFER_WIDTH*SAMPLES)-1:0]s01_tdata_imag = 0;
+    reg [(BUFFER_WIDTH*SAMPLES)-1:0]s20_tdata_real = 0; reg [(BUFFER_WIDTH*SAMPLES)-1:0]s20_tdata_imag = 0;
+    reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_tdata_real = 0; reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_tdata_imag = 0;
 
     // reg [((SSAMPLE_WIDTH+3)-1)*SAMPLES:0]dataBuffer_Sum;
     reg [BUFFER_WIDTH_SUM*SAMPLES:0]dataBuffer_SumRe = 0;
@@ -143,11 +147,6 @@ module axis_adder
 
     // pipelining for channel00 because it's the channel we're writing the summed & weighted data to
     reg [MDATA_WIDTH-1:0]m00_tdata_real = 0; reg [MDATA_WIDTH-1:0]m00_tdata_imag = 0;
-
-    reg [(BUFFER_WIDTH*SAMPLES)-1:0]s00_tdata_real = 0; reg [(BUFFER_WIDTH*SAMPLES)-1:0]s00_tdata_imag = 0;
-    reg [(BUFFER_WIDTH*SAMPLES)-1:0]s01_tdata_real = 0; reg [(BUFFER_WIDTH*SAMPLES)-1:0]s01_tdata_imag = 0;
-    reg [(BUFFER_WIDTH*SAMPLES)-1:0]s20_tdata_real = 0; reg [(BUFFER_WIDTH*SAMPLES)-1:0]s20_tdata_imag = 0;
-    reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_tdata_real = 0; reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_tdata_imag = 0;
 
     // buffers for multiplication (for applying beamforming weights)
     //        reg [(BUFFER_WIDTH*SAMPLES)-1:0]s00_rr_weighted = reg [((16+8)*8)-1:0]s00_rr_weighted
@@ -166,6 +165,9 @@ module axis_adder
     reg [BUFFER_WIDTH-1:0] bw01_re = 0;  reg [BUFFER_WIDTH-1:0] bw01_im = 0;
     reg [BUFFER_WIDTH-1:0] bw20_re = 0;  reg [BUFFER_WIDTH-1:0] bw20_im = 0;
     reg [BUFFER_WIDTH-1:0] bw21_re = 0;  reg [BUFFER_WIDTH-1:0] bw21_im = 0;
+
+    reg [SSAMPLE_WIDTH-1:0] spongeyBob = 0;
+    reg [BUFFER_WIDTH-1:0] garyTheSnail = 0;
 
     always @(posedge clock) begin
         //~resetn
@@ -203,15 +205,17 @@ module axis_adder
             m20_axis_real_s2mm_tlast <= s20_axis_real_tlast;    m20_axis_imag_s2mm_tlast <= s20_axis_imag_tlast;
             m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
 
+            garyTheSnail = ~spongeyBob <<< WEIGHT_WIDTH;
+
             // setting beamforming weight registers for pipelining and sign-extending each for later multiplication
-            bw00_re <= bWeight00_real;
-            bw00_im <= bWeight00_imag;
-            bw01_re <= bWeight01_real;
-            bw01_im <= bWeight01_imag;
-            bw20_re <= bWeight20_real;
-            bw20_im <= bWeight20_imag;
-            bw21_re <= bWeight21_real;
-            bw21_im <= bWeight21_imag;
+            bw00_re <= bWeight00_real | (bWeight00_real[WEIGHT_WIDTH]*garyTheSnail);
+            bw00_im <= bWeight00_imag | (bWeight00_imag[WEIGHT_WIDTH]*garyTheSnail);
+            bw01_re <= bWeight01_real | (bWeight01_real[WEIGHT_WIDTH]*garyTheSnail);
+            bw01_im <= bWeight01_imag | (bWeight01_imag[WEIGHT_WIDTH]*garyTheSnail);
+            bw20_re <= bWeight20_real | (bWeight20_real[WEIGHT_WIDTH]*garyTheSnail);
+            bw20_im <= bWeight20_imag | (bWeight20_imag[WEIGHT_WIDTH]*garyTheSnail);
+            bw21_re <= bWeight21_real | (bWeight21_real[WEIGHT_WIDTH]*garyTheSnail);
+            bw21_im <= bWeight21_imag | (bWeight21_imag[WEIGHT_WIDTH]*garyTheSnail);
 
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
