@@ -269,8 +269,8 @@ module axis_adder
             /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m00_axis_real_s2mm_tdata <= 128'b0;
-                m00_axis_imag_s2mm_tdata <= 128'b0;
+                m00_tdata_real <= 128'b0;
+                m00_tdata_imag <= 128'b0;
 
                 // output valid and output tkeep should be low
                 m00_axis_real_s2mm_tvalid <= 1'b0; m00_axis_imag_s2mm_tvalid <= 1'b0;
@@ -446,6 +446,12 @@ module axis_adder
                     
                     m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*BUFFER_WIDTH_SUM +: MSAMPLE_WIDTH];
                 end
+            end
+            // making sure channel00 has output data if none of the channels have valid data
+            else begin 
+                // invalid data, so output data is set to static value of 0
+                m00_axis_real_s2mm_tdata <= 128'b0;
+                m00_axis_imag_s2mm_tdata <= 128'b0;
             end
          end
     end
