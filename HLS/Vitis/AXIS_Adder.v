@@ -159,36 +159,32 @@ module axis_adder
     reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_rr_weighted = 0;  reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_ii_weighted = 0;
     reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_ri_weighted = 0;  reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_ir_weighted = 0;
 
-
     // pipelining for beamforming weights
     reg [BUFFER_WIDTH-1:0] bw00_re = 0;  reg [BUFFER_WIDTH-1:0] bw00_im = 0;
     reg [BUFFER_WIDTH-1:0] bw01_re = 0;  reg [BUFFER_WIDTH-1:0] bw01_im = 0;
     reg [BUFFER_WIDTH-1:0] bw20_re = 0;  reg [BUFFER_WIDTH-1:0] bw20_im = 0;
     reg [BUFFER_WIDTH-1:0] bw21_re = 0;  reg [BUFFER_WIDTH-1:0] bw21_im = 0;
 
-    reg [SSAMPLE_WIDTH-1:0] garyTheSnail = 16'hffff;
-    reg [WEIGHT_WIDTH-1:0] spongeyBob = 8'h0;
-
     always @(posedge clock) begin
         //~resetn
         if (resetn == 1'b0) begin
             // data out, valid, tready, and tlast should all be 0
-            m00_axis_real_s2mm_tdata = 128'b0;   m00_axis_imag_s2mm_tdata = 128'b0;
+            m00_axis_real_s2mm_tdata = 128'b0; m00_axis_imag_s2mm_tdata = 128'b0;
             m00_axis_real_s2mm_tvalid = 1'b0;  m00_axis_imag_s2mm_tvalid = 1'b0;
             s00_axis_real_tready = 1'b0;       s00_axis_imag_tready = 1'b0;
             m00_axis_real_s2mm_tlast = 1'b0;   m00_axis_imag_s2mm_tlast = 1'b0;
 
-            m01_axis_real_s2mm_tdata = 128'b0;   m01_axis_imag_s2mm_tdata = 128'b0;
+            m01_axis_real_s2mm_tdata = 128'b0; m01_axis_imag_s2mm_tdata = 128'b0;
             m01_axis_real_s2mm_tvalid = 1'b0;  m01_axis_imag_s2mm_tvalid = 1'b0;
             s01_axis_real_tready = 1'b0;       s01_axis_imag_tready = 1'b0;
             m01_axis_real_s2mm_tlast = 1'b0;   m01_axis_imag_s2mm_tlast = 1'b0;
 
-            m20_axis_real_s2mm_tdata = 128'b0;   m20_axis_imag_s2mm_tdata = 128'b0;
+            m20_axis_real_s2mm_tdata = 128'b0; m20_axis_imag_s2mm_tdata = 128'b0;
             m20_axis_real_s2mm_tvalid = 1'b0;  m20_axis_imag_s2mm_tvalid = 1'b0;
             s20_axis_real_tready = 1'b0;       s20_axis_imag_tready = 1'b0;
             m20_axis_real_s2mm_tlast = 1'b0;   m20_axis_imag_s2mm_tlast = 1'b0;
 
-            m21_axis_real_s2mm_tdata = 128'b0;   m21_axis_imag_s2mm_tdata = 128'b0;
+            m21_axis_real_s2mm_tdata = 128'b0; m21_axis_imag_s2mm_tdata = 128'b0;
             m21_axis_real_s2mm_tvalid = 1'b0;  m21_axis_imag_s2mm_tvalid = 1'b0;
             s21_axis_real_tready = 1'b0;       s21_axis_imag_tready = 1'b0;
             m21_axis_real_s2mm_tlast = 1'b0;   m21_axis_imag_s2mm_tlast = 1'b0;
@@ -206,14 +202,14 @@ module axis_adder
             m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
 
             // setting beamforming weight registers for pipelining and sign-extending each for later multiplication
-            bw00_re <= {bWeight00_real[WEIGHT_WIDTH]*garyTheSnail, bWeight00_real};
-            bw00_im <= {bWeight00_imag[WEIGHT_WIDTH]*garyTheSnail, bWeight00_imag};
-            bw01_re <= {bWeight01_real[WEIGHT_WIDTH]*garyTheSnail, bWeight01_real};
-            bw01_im <= {bWeight01_imag[WEIGHT_WIDTH]*garyTheSnail, bWeight01_imag};
-            bw20_re <= {bWeight20_real[WEIGHT_WIDTH]*garyTheSnail, bWeight20_real};
-            bw20_im <= {bWeight20_real[WEIGHT_WIDTH]*garyTheSnail, bWeight20_imag};
-            bw21_re <= {bWeight21_real[WEIGHT_WIDTH]*garyTheSnail, bWeight21_real};
-            bw21_im <= {bWeight21_real[WEIGHT_WIDTH]*garyTheSnail, bWeight21_imag};
+            bw00_re <= {{BUFFER_WIDTH{bWeight00_real[WEIGHT_WIDTH]}}, bWeight00_real};
+            bw00_im <= {{BUFFER_WIDTH{bWeight00_imag[WEIGHT_WIDTH]}}, bWeight00_imag};
+            bw01_re <= {{BUFFER_WIDTH{bWeight01_real[WEIGHT_WIDTH]}}, bWeight01_real};
+            bw01_im <= {{BUFFER_WIDTH{bWeight01_imag[WEIGHT_WIDTH]}}, bWeight01_imag};
+            bw20_re <= {{BUFFER_WIDTH{bWeight20_real[WEIGHT_WIDTH]}}, bWeight20_real};
+            bw20_im <= {{BUFFER_WIDTH{bWeight20_imag[WEIGHT_WIDTH]}}, bWeight20_imag};
+            bw21_re <= {{BUFFER_WIDTH{bWeight21_real[WEIGHT_WIDTH]}}, bWeight21_real};
+            bw21_im <= {{BUFFER_WIDTH{bWeight21_imag[WEIGHT_WIDTH]}}, bWeight21_imag};
 
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
@@ -226,8 +222,8 @@ module axis_adder
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // left shifting real and imaginary parts of tdata so when we multiply by the fixed-point weights all the bits line up
-                    s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], spongeyBob};
-                    s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], spongeyBob};
+                    s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
+                    s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
 
                     s00_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
                     s00_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
@@ -270,8 +266,8 @@ module axis_adder
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // left shifting real and imaginary parts of tdata so when we multiply by the fixed-point weights all the bits line up
-                    s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], spongeyBob};
-                    s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], spongeyBob};
+                    s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
+                    s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
 
                     s01_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
                     s01_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
@@ -314,8 +310,8 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     // left shifting real and imaginary parts of tdata so when we multiply by the fixed-point weights all the bits line up
-                    s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], spongeyBob};
-                    s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], spongeyBob};
+                    s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
+                    s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
 
                     s20_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
                     s20_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
@@ -357,8 +353,8 @@ module axis_adder
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // left shifting real and imaginary parts of tdata so when we multiply by the fixed-point weights all the bits line up
-                    s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], spongeyBob};
-                    s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], spongeyBob};
+                    s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
+                    s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
 
 
                     s21_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_re;
