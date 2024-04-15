@@ -222,8 +222,8 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
-                    s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
-                    s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
+                    s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s00_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+                    s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s00_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
 
                     s00_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
                     s00_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
@@ -266,8 +266,8 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
-                    s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
-                    s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
+                    s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s01_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+                    s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s01_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
 
                     s01_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
                     s01_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
@@ -309,8 +309,8 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
-                    s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
-                    s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
+                    s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s20_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+                    s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s20_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
 
                     s20_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
                     s20_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
@@ -352,8 +352,8 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
-                    s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
-                    s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH], {WEIGHT_WIDTH{0}}};
+                    s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s21_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+                    s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s21_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
 
                     s21_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_re;
                     s21_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_im;
