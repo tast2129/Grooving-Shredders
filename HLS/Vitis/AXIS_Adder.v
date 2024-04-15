@@ -209,14 +209,14 @@ module axis_adder
             m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
 
             // setting beamforming weight registers for pipelining and sign-extending each for later multiplication
-            bw00_re <= bWeight00_real >>> SSAMPLE_WIDTH;
-            bw00_im <= bWeight00_imag >>> SSAMPLE_WIDTH;
-            bw01_re <= bWeight01_real >>> SSAMPLE_WIDTH;
-            bw01_im <= bWeight01_imag >>> SSAMPLE_WIDTH;
-            bw20_re <= bWeight20_real >>> SSAMPLE_WIDTH;
-            bw20_im <= bWeight20_imag >>> SSAMPLE_WIDTH;
-            bw21_re <= bWeight21_real >>> SSAMPLE_WIDTH;
-            bw21_im <= bWeight21_imag >>> SSAMPLE_WIDTH;
+            bw00_re <= bWeight00_real;
+            bw00_im <= bWeight00_imag;
+            bw01_re <= bWeight01_real;
+            bw01_im <= bWeight01_imag;
+            bw20_re <= bWeight20_real;
+            bw20_im <= bWeight20_imag;
+            bw21_re <= bWeight21_real;
+            bw21_im <= bWeight21_imag;
 
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
