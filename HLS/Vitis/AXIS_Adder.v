@@ -172,15 +172,10 @@ module axis_adder
     reg [BUFFER_WIDTH-1:0] bw20_re = 0;  reg [BUFFER_WIDTH-1:0] bw20_im = 0;
     reg [BUFFER_WIDTH-1:0] bw21_re = 0;  reg [BUFFER_WIDTH-1:0] bw21_im = 0;
 
-<<<<<<< HEAD
     reg [WEIGHT_WIDTH-1:0] spongeyBob = 0;
     reg [SSAMPLE_WIDTH-1:0] patrickStar = 0;
     reg [BUFFER_WIDTH-1:0] garyTheSnail = 0;
     reg [BUFFER_WIDTH-1:0] sandyCheeks = 0;
-=======
-    reg [SSAMPLE_WIDTH-1:0] spongeyBob = 0;
-    reg signed [BUFFER_WIDTH-1:0] garyTheSnail = 0;
->>>>>>> 663bda9a92b1f0c0c94f94047796f92f15d4e89a
     
     always @(posedge clock) begin
         //~resetn
@@ -279,8 +274,8 @@ module axis_adder
             /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m00_axis_real_s2mm_tdata <= 128'b0;
-                m00_axis_imag_s2mm_tdata <= 128'b0;
+                m00_tdata_real <= 128'b0;
+                m00_tdata_imag <= 128'b0;
 
                 // output valid and output tkeep should be low
                 m00_axis_real_s2mm_tvalid <= 1'b0; m00_axis_imag_s2mm_tvalid <= 1'b0;
@@ -456,6 +451,12 @@ module axis_adder
                     
                     m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*BUFFER_WIDTH_SUM +: MSAMPLE_WIDTH];
                 end
+            end
+            // making sure channel00 has output value if none of the channels are valid
+            else begin 
+                // invalid data, so output data is set to static value of 0
+                m00_axis_real_s2mm_tdata <= 128'b0;
+                m00_axis_imag_s2mm_tdata <= 128'b0;
             end
          end
     end
