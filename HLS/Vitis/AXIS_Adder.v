@@ -174,6 +174,9 @@ module axis_adder
 
     reg [SSAMPLE_WIDTH-1:0] spongeyBob = 0;
     reg signed [BUFFER_WIDTH-1:0] garyTheSnail = 0;
+
+    // <3 (this is just a bit mask for "sign extension" of slave tdata buffers)
+    assign garyTheSnail <= ~spongeyBob <<< WEIGHT_WIDTH;
     
     always @(posedge clock) begin
         //~resetn
@@ -220,9 +223,6 @@ module axis_adder
             bw20_im <= bWeight20_imag <<< SSAMPLE_WIDTH;
             bw21_re <= bWeight21_real <<< SSAMPLE_WIDTH;
             bw21_im <= bWeight21_imag <<< SSAMPLE_WIDTH;
-
-            // <3 (this is just a bit mask for "sign extension" of slave tdata buffers)
-            garyTheSnail <= ~spongeyBob <<< WEIGHT_WIDTH;
 
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
