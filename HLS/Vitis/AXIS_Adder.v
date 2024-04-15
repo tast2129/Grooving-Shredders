@@ -162,11 +162,6 @@ module axis_adder
 
 
     // pipelining for beamforming weights
-    reg [BUFFER_WIDTH-1:0] bw00_re_ = 0; reg [BUFFER_WIDTH-1:0] bw00_im_ = 0;
-    reg [BUFFER_WIDTH-1:0] bw01_re_ = 0; reg [BUFFER_WIDTH-1:0] bw01_im_ = 0;
-    reg [BUFFER_WIDTH-1:0] bw20_re_ = 0; reg [BUFFER_WIDTH-1:0] bw20_im_ = 0;
-    reg [BUFFER_WIDTH-1:0] bw21_re_ = 0; reg [BUFFER_WIDTH-1:0] bw21_im_ = 0;
-
     reg [BUFFER_WIDTH-1:0] bw00_re = 0;  reg [BUFFER_WIDTH-1:0] bw00_im = 0;
     reg [BUFFER_WIDTH-1:0] bw01_re = 0;  reg [BUFFER_WIDTH-1:0] bw01_im = 0;
     reg [BUFFER_WIDTH-1:0] bw20_re = 0;  reg [BUFFER_WIDTH-1:0] bw20_im = 0;
