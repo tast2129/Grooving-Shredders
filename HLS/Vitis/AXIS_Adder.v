@@ -228,17 +228,9 @@ module axis_adder
                 for(i=0; i<SAMPLES; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
-                    // sign extending real and imag parts of slave data for multiplication
-                    if (s00_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
-                    end else begin
-                        s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-                    end
-                    if (s00_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
-                    end else begin
-                        s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-                    end
+                    // left shifting real and imaginary parts of tdata so when we multiply by the fixed-point weights all the bits line up
+                    s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
+                    s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
 
                     s00_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
                     s00_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
@@ -280,17 +272,9 @@ module axis_adder
                 for(i=0; i<SAMPLES; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
-                    // sign extending real and imag parts of slave data for multiplication
-                    if (s01_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
-                    end else begin
-                        s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-                    end
-                    if (s01_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
-                    end else begin
-                        s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-                    end
+                    // left shifting real and imaginary parts of tdata so when we multiply by the fixed-point weights all the bits line up
+                    s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
+                    s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
 
                     s01_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
                     s01_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
@@ -332,16 +316,9 @@ module axis_adder
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
-                    if (s20_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
-                    end else begin
-                        s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-                    end
-                    if (s20_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
-                    end else begin
-                        s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-                    end
+                    // left shifting real and imaginary parts of tdata so when we multiply by the fixed-point weights all the bits line up
+                    s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
+                    s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
 
                     s20_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
                     s20_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
@@ -382,17 +359,10 @@ module axis_adder
                 for(i=0; i<SAMPLES; i = i+1) begin
                     // this can be a non-blocking assignment because there is a blocking assignment in the incrementing of i
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
-                    // sign extending real and imag parts of slave data for multiplication
-                    if (s21_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
-                    end else begin
-                        s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-                    end
-                    if (s21_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
-                    end else begin
-                        s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
-                    end
+                    // left shifting real and imaginary parts of tdata so when we multiply by the fixed-point weights all the bits line up
+                    s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
+                    s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
+
 
                     s21_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_re;
                     s21_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_im;
