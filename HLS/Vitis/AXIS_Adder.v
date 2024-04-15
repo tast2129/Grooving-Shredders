@@ -172,12 +172,6 @@ module axis_adder
     reg [BUFFER_WIDTH-1:0] bw20_re = 0;  reg [BUFFER_WIDTH-1:0] bw20_im = 0;
     reg [BUFFER_WIDTH-1:0] bw21_re = 0;  reg [BUFFER_WIDTH-1:0] bw21_im = 0;
 
-    reg [SSAMPLE_WIDTH-1:0] spongeyBob = 0;
-    //reg signed [BUFFER_WIDTH-1:0] garyTheSnail = 0;
-
-    // <3 (this is just a bit mask for "sign extension" of slave tdata buffers)
-    reg signed [BUFFER_WIDTH-1:0] garyTheSnail = ~spongeyBob <<< SSAMPLE_WIDTH;
-    
     always @(posedge clock) begin
         //~resetn
         if (resetn == 1'b0) begin
@@ -236,18 +230,18 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     if (s00_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] | garyTheSnail;
+                        s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
                     end else begin
                         s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     end
                     if (s00_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] | garyTheSnail;
+                        s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
                     end else begin
                         s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     end
 
-                    s00_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw00_re;
-                    s00_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw00_im;
+                    s00_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
+                    s00_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
 
                     // truncating s00_rr_weighted and s00_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
                     // enables us to do this because their sign is preserved)
@@ -257,8 +251,8 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
 
-                    s00_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw00_im;
-                    s00_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw00_re;
+                    s00_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
+                    s00_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
 
                     addDataBuffer00_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s00_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
                                                                       + s00_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
@@ -288,18 +282,18 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     if (s01_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] | garyTheSnail;
+                        s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
                     end else begin
                         s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     end
                     if (s01_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] | garyTheSnail;
+                        s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
                     end else begin
                         s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     end
 
-                    s01_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw01_re;
-                    s01_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw01_im;
+                    s01_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
+                    s01_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
 
                     // truncating s01_rr_weighted and s01_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
                     // enables us to do this because their sign is preserved)
@@ -308,8 +302,8 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer01_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
 
-                    s01_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw01_im;
-                    s01_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw01_re;
+                    s01_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
+                    s01_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
 
                     addDataBuffer01_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s01_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
                                                                       + s01_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
@@ -339,18 +333,18 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     if (s20_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] | garyTheSnail;
+                        s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
                     end else begin
                         s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     end
                     if (s20_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] | garyTheSnail;
+                        s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
                     end else begin
                         s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     end
 
-                    s20_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw20_re;
-                    s20_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw20_im;
+                    s20_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
+                    s20_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
 
                     // truncating s20_rr_weighted and s20_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
                     // enables us to do this because their sign is preserved)
@@ -359,8 +353,8 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer20_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
 
-                    s20_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw20_im;
-                    s20_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw20_re;
+                    s20_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
+                    s20_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
 
                     addDataBuffer20_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s20_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
                                                                       + s20_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
@@ -390,18 +384,18 @@ module axis_adder
                     /* multiply by appropriate weight, accounting for complex/real parts of weight */
                     // sign extending real and imag parts of slave data for multiplication
                     if (s21_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] | garyTheSnail;
+                        s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
                     end else begin
                         s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     end
                     if (s21_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]) begin
-                        s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] | garyTheSnail;
+                        s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH] <<< WEIGHT_WIDTH;
                     end else begin
                         s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH];
                     end
 
-                    s21_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw21_re;
-                    s21_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw21_im;
+                    s21_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_re;
+                    s21_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_im;
 
                     // truncating s21_rr_weighted and s21_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
                     // enables us to do this because their sign is preserved)
@@ -410,8 +404,8 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer21_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
 
-                    s21_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw21_im;
-                    s21_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]/bw21_re;
+                    s21_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_im;
+                    s21_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_re;
 
                     addDataBuffer21_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s21_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
                                                                       + s21_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
