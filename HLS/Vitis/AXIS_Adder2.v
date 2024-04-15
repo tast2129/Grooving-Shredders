@@ -18,14 +18,14 @@ module axis_adder
     input wire resetn,
 
     // this will be the multiplication factor for all 16 samples in its channel, should be <1
-    input reg [WEIGHT_WIDTH-1:0] bWeight00_real, // unsigned, 8-bit integer
-    input reg [WEIGHT_WIDTH-1:0] bWeight00_imag, // unsigned, 8-bit integer
-    input reg [WEIGHT_WIDTH-1:0] bWeight01_real, // unsigned, 8-bit integer
-    input reg [WEIGHT_WIDTH-1:0] bWeight01_imag, // unsigned, 8-bit integer
-    input reg [WEIGHT_WIDTH-1:0] bWeight20_real, // unsigned, 8-bit integer
-    input reg [WEIGHT_WIDTH-1:0] bWeight20_imag, // unsigned, 8-bit integer
-    input reg [WEIGHT_WIDTH-1:0] bWeight21_real, // unsigned, 8-bit integer
-    input reg [WEIGHT_WIDTH-1:0] bWeight21_imag, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight00_real, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight00_imag, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight01_real, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight01_imag, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight20_real, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight20_imag, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight21_real, // unsigned, 8-bit integer
+    input [WEIGHT_WIDTH-1:0] bWeight21_imag, // unsigned, 8-bit integer
     
     /* all axis prefixed variables should be inferred per UG994 because of the 
      * use of the AXI standard naming convention */
