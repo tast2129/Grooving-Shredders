@@ -173,10 +173,10 @@ module axis_adder
     reg [BUFFER_WIDTH-1:0] bw21_re = 0;  reg [BUFFER_WIDTH-1:0] bw21_im = 0;
 
     reg [SSAMPLE_WIDTH-1:0] spongeyBob = 0;
-    reg signed [BUFFER_WIDTH-1:0] garyTheSnail = 0;
+    //reg signed [BUFFER_WIDTH-1:0] garyTheSnail = 0;
 
     // <3 (this is just a bit mask for "sign extension" of slave tdata buffers)
-    assign garyTheSnail <= ~spongeyBob <<< WEIGHT_WIDTH;
+    reg signed [BUFFER_WIDTH-1:0] garyTheSnail = ~spongeyBob <<< SSAMPLE_WIDTH;
     
     always @(posedge clock) begin
         //~resetn
@@ -203,7 +203,7 @@ module axis_adder
             m21_axis_real_s2mm_tlast = 1'b0;   m21_axis_imag_s2mm_tlast = 1'b0;
         end
         else begin
-            // always ready if not reset!
+            // always ready if not reset
             s00_axis_real_tready = 1'b1;       s00_axis_imag_tready = 1'b1;
             s01_axis_real_tready = 1'b1;       s01_axis_imag_tready = 1'b1;
             s20_axis_real_tready = 1'b1;       s20_axis_imag_tready = 1'b1;
@@ -215,14 +215,14 @@ module axis_adder
             m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
 
             // setting beamforming weight registers for pipelining and sign-extending each for later multiplication
-            bw00_re <= bWeight00_real <<< SSAMPLE_WIDTH;
-            bw00_im <= bWeight00_imag <<< SSAMPLE_WIDTH;
-            bw01_re <= bWeight01_real <<< SSAMPLE_WIDTH;
-            bw01_im <= bWeight01_imag <<< SSAMPLE_WIDTH;
-            bw20_re <= bWeight20_real <<< SSAMPLE_WIDTH;
-            bw20_im <= bWeight20_imag <<< SSAMPLE_WIDTH;
-            bw21_re <= bWeight21_real <<< SSAMPLE_WIDTH;
-            bw21_im <= bWeight21_imag <<< SSAMPLE_WIDTH;
+            bw00_re <= bWeight00_real >>> SSAMPLE_WIDTH;
+            bw00_im <= bWeight00_imag >>> SSAMPLE_WIDTH;
+            bw01_re <= bWeight01_real >>> SSAMPLE_WIDTH;
+            bw01_im <= bWeight01_imag >>> SSAMPLE_WIDTH;
+            bw20_re <= bWeight20_real >>> SSAMPLE_WIDTH;
+            bw20_im <= bWeight20_imag >>> SSAMPLE_WIDTH;
+            bw21_re <= bWeight21_real >>> SSAMPLE_WIDTH;
+            bw21_im <= bWeight21_imag >>> SSAMPLE_WIDTH;
 
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
