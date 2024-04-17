@@ -9,7 +9,7 @@ module axis_adder
     parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
     parameter MDATA_WIDTH = 128,     // MSAMPLE_WIDTH * SAMPLES
     parameter BUFFER_WIDTH = SSAMPLE_WIDTH+WEIGHT_WIDTH,
-    parameter SUM_BUFFER = MSAMPLE_WIDTH+3,
+    parameter SUM_BUFFER = MSAMPLE_WIDTH+1,
     parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH
    ) 
     (
@@ -151,6 +151,9 @@ module axis_adder
 
     // pipelining for channel00 because it's the channel we're writing the summed & weighted data to
     reg [MDATA_WIDTH-1:0]m00_tdata_real = 0; reg [MDATA_WIDTH-1:0]m00_tdata_imag = 0;
+    reg [MDATA_WIDTH-1:0]m01_tdata_real = 0; reg [MDATA_WIDTH-1:0]m01_tdata_imag = 0;
+    reg [MDATA_WIDTH-1:0]m20_tdata_real = 0; reg [MDATA_WIDTH-1:0]m20_tdata_imag = 0;
+    reg [MDATA_WIDTH-1:0]m21_tdata_real = 0; reg [MDATA_WIDTH-1:0]m21_tdata_imag = 0;
 
     // buffers for multiplication (for applying beamforming weights)
     //        reg [(BUFFER_WIDTH*SAMPLES)-1:0]s00_rr_weighted = reg [((16+8)*8)-1:0]s00_rr_weighted
@@ -169,182 +172,24 @@ module axis_adder
     reg [BUFFER_WIDTH-1:0] bw20_re = 0;  reg [BUFFER_WIDTH-1:0] bw20_im = 0;
     reg [BUFFER_WIDTH-1:0] bw21_re = 0;  reg [BUFFER_WIDTH-1:0] bw21_im = 0;
 
+    /*=====================================CHANNEL 21 (ADC A)=====================================*/
     always @(posedge clock) begin
         //~resetn
         if (resetn == 1'b0) begin
             // data out, valid, tready, and tlast should all be 0
-            m00_axis_real_s2mm_tdata = 128'b0; m00_axis_imag_s2mm_tdata = 128'b0;
-            m00_axis_real_s2mm_tvalid = 1'b0;  m00_axis_imag_s2mm_tvalid = 1'b0;
-            s00_axis_real_tready = 1'b0;       s00_axis_imag_tready = 1'b0;
-            m00_axis_real_s2mm_tlast = 1'b0;   m00_axis_imag_s2mm_tlast = 1'b0;
-
-            m01_axis_real_s2mm_tdata = 128'b0; m01_axis_imag_s2mm_tdata = 128'b0;
-            m01_axis_real_s2mm_tvalid = 1'b0;  m01_axis_imag_s2mm_tvalid = 1'b0;
-            s01_axis_real_tready = 1'b0;       s01_axis_imag_tready = 1'b0;
-            m01_axis_real_s2mm_tlast = 1'b0;   m01_axis_imag_s2mm_tlast = 1'b0;
-
-            m20_axis_real_s2mm_tdata = 128'b0; m20_axis_imag_s2mm_tdata = 128'b0;
-            m20_axis_real_s2mm_tvalid = 1'b0;  m20_axis_imag_s2mm_tvalid = 1'b0;
-            s20_axis_real_tready = 1'b0;       s20_axis_imag_tready = 1'b0;
-            m20_axis_real_s2mm_tlast = 1'b0;   m20_axis_imag_s2mm_tlast = 1'b0;
-
-            m21_axis_real_s2mm_tdata = 128'b0; m21_axis_imag_s2mm_tdata = 128'b0;
+            m21_tdata_real <= 128'b0;          m21_tdata_imag <= 128'b0;
             m21_axis_real_s2mm_tvalid = 1'b0;  m21_axis_imag_s2mm_tvalid = 1'b0;
             s21_axis_real_tready = 1'b0;       s21_axis_imag_tready = 1'b0;
             m21_axis_real_s2mm_tlast = 1'b0;   m21_axis_imag_s2mm_tlast = 1'b0;
         end
         else begin
             // always ready if not reset
-            s00_axis_real_tready = 1'b1;       s00_axis_imag_tready = 1'b1;
-            s01_axis_real_tready = 1'b1;       s01_axis_imag_tready = 1'b1;
-            s20_axis_real_tready = 1'b1;       s20_axis_imag_tready = 1'b1;
             s21_axis_real_tready = 1'b1;       s21_axis_imag_tready = 1'b1;
-
-            m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;    m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
-            m01_axis_real_s2mm_tlast <= s01_axis_real_tlast;    m01_axis_imag_s2mm_tlast <= s01_axis_imag_tlast;
-            m20_axis_real_s2mm_tlast <= s20_axis_real_tlast;    m20_axis_imag_s2mm_tlast <= s20_axis_imag_tlast;
             m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
 
-            // setting beamforming weight registers for pipelining and sign-extending each for later multiplication
-            bw00_re <= {{SSAMPLE_WIDTH{bWeight00_real[WEIGHT_WIDTH]}}, bWeight00_real};
-            bw00_im <= {{SSAMPLE_WIDTH{bWeight00_imag[WEIGHT_WIDTH]}}, bWeight00_imag};
-            bw01_re <= {{SSAMPLE_WIDTH{bWeight01_real[WEIGHT_WIDTH]}}, bWeight01_real};
-            bw01_im <= {{SSAMPLE_WIDTH{bWeight01_imag[WEIGHT_WIDTH]}}, bWeight01_imag};
-            bw20_re <= {{SSAMPLE_WIDTH{bWeight20_real[WEIGHT_WIDTH]}}, bWeight20_real};
-            bw20_im <= {{SSAMPLE_WIDTH{bWeight20_imag[WEIGHT_WIDTH]}}, bWeight20_imag};
             bw21_re <= {{SSAMPLE_WIDTH{bWeight21_real[WEIGHT_WIDTH]}}, bWeight21_real};
             bw21_im <= {{SSAMPLE_WIDTH{bWeight21_imag[WEIGHT_WIDTH]}}, bWeight21_imag};
 
-            /*------------------------CHANNEL 00 READY/VALID------------------------*/
-            if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
-                // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
-                m00_axis_real_s2mm_tkeep <= 16'hffff;   m00_axis_imag_s2mm_tkeep <= 16'hffff;
-                m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
-
-                // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<SAMPLES; i = i+1) begin
-                    /* multiply by appropriate weight, accounting for complex/real parts of weight */
-                    // sign extending real and imag parts of slave data for multiplication
-                    // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
-                    s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s00_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
-                    s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s00_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
-
-                    s00_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
-                    s00_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
-
-                    // truncating s00_rr_weighted and s00_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
-                    // enables us to do this because their sign is preserved)
-                    //      KATIE pls double check that verilog will truncate to the LSBs in this assignment (and NOT the MSBs)
-                    addDataBuffer00_re[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s00_rr_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
-                                                                      - s00_ii_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
-                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
-                    m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
-
-                    s00_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
-                    s00_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
-
-                    addDataBuffer00_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s00_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
-                                                                      + s00_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
-                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
-                    m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
-                end
-            end
-            /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
-            else begin 
-                // invalid data, so output data is set to static value of 0
-                m00_tdata_real <= 128'b0;
-                m00_tdata_imag <= 128'b0;
-
-                // output valid and output tkeep should be low
-                m00_axis_real_s2mm_tvalid <= 1'b0; m00_axis_imag_s2mm_tvalid <= 1'b0;
-                m00_axis_real_s2mm_tkeep <= 1'b0;  m00_axis_imag_s2mm_tkeep <= 1'b0;
-            end
-            /*------------------------CHANNEL 01 READY/VALID------------------------*/
-            if (m01_axis_real_s2mm_tready && s01_axis_real_tvalid && m01_axis_imag_s2mm_tready && s01_axis_imag_tvalid) begin
-                // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
-                m01_axis_real_s2mm_tkeep <= 16'hffff;   m01_axis_imag_s2mm_tkeep <= 16'hffff;
-                m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
-
-                // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<SAMPLES; i = i+1) begin
-                    /* multiply by appropriate weight, accounting for complex/real parts of weight */
-                    // sign extending real and imag parts of slave data for multiplication
-                    // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
-                    s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s01_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
-                    s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s01_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
-
-                    s01_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
-                    s01_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
-
-                    // truncating s01_rr_weighted and s01_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
-                    // enables us to do this because their sign is preserved)
-                    addDataBuffer01_re[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s01_rr_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
-                                                                      - s01_ii_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
-                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
-                    m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer01_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
-
-                    s01_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
-                    s01_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
-
-                    addDataBuffer01_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s01_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
-                                                                      + s01_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
-                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
-                    m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer01_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
-                end
-            end
-            /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
-            else begin 
-                // invalid data, so output data is set to static value of 0
-                m01_axis_real_s2mm_tdata <= 128'b0;
-                m01_axis_imag_s2mm_tdata <= 128'b0;
-
-                // output valid and output tkeep should be low
-                m01_axis_real_s2mm_tvalid <= 1'b0; m01_axis_imag_s2mm_tvalid <= 1'b0;
-                m01_axis_real_s2mm_tkeep <= 1'b0;  m01_axis_imag_s2mm_tkeep <= 1'b0;
-            end
-            /*------------------------CHANNEL 20 READY/VALID------------------------*/
-            if (m20_axis_real_s2mm_tready && s20_axis_real_tvalid && m20_axis_imag_s2mm_tready && s20_axis_imag_tvalid) begin
-                // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
-                m20_axis_real_s2mm_tkeep <= 16'hffff;   m20_axis_imag_s2mm_tkeep <= 16'hffff;
-                m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
-
-                // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<SAMPLES; i = i+1) begin
-                    /* multiply by appropriate weight, accounting for complex/real parts of weight */
-                    // sign extending real and imag parts of slave data for multiplication
-                    // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
-                    s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s20_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
-                    s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s20_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
-
-                    s20_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
-                    s20_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
-
-                    // truncating s20_rr_weighted and s20_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
-                    // enables us to do this because their sign is preserved)
-                    addDataBuffer20_re[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s20_rr_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
-                                                                      - s20_ii_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
-                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
-                    m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer20_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
-
-                    s20_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
-                    s20_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
-
-                    addDataBuffer20_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s20_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
-                                                                      + s20_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
-                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
-                    m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer20_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
-                end
-            end
-            /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
-            else begin 
-                // invalid data, so output data is set to static value of 0
-                m20_axis_real_s2mm_tdata <= 128'b0;
-                m20_axis_imag_s2mm_tdata <= 128'b0;
-
-                // output valid and output tkeep should be low
-                m20_axis_real_s2mm_tvalid <= 1'b0; m20_axis_imag_s2mm_tvalid <= 1'b0;
-                m20_axis_real_s2mm_tkeep <= 1'b0;  m20_axis_imag_s2mm_tkeep <= 1'b0;
-            end
             /*------------------------CHANNEL 21 READY/VALID------------------------*/
             if (m21_axis_real_s2mm_tready && s21_axis_real_tvalid && m21_axis_imag_s2mm_tready && s21_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
@@ -388,30 +233,249 @@ module axis_adder
                 m21_axis_real_s2mm_tvalid <= 1'b0; m21_axis_imag_s2mm_tvalid <= 1'b0;
                 m21_axis_real_s2mm_tkeep <= 1'b0;  m21_axis_imag_s2mm_tkeep <= 1'b0;
             end
+        end
+    end
+    /*===================================END CHANNEL 20 (ADC B)===================================*/
 
-            if ((m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid)) begin
+    /*=====================================CHANNEL 20 (ADC B)=====================================*/
+    always @(posedge clock) begin
+        //~resetn
+        if (resetn == 1'b0) begin
+            // data out, valid, tready, and tlast should all be 0
+            m20_tdata_real <= 128'b0;          m20_tdata_imag <= 128'b0;
+            m20_axis_real_s2mm_tvalid = 1'b0;  m20_axis_imag_s2mm_tvalid = 1'b0;
+            s20_axis_real_tready = 1'b0;       s20_axis_imag_tready = 1'b0;
+            m20_axis_real_s2mm_tlast = 1'b0;   m20_axis_imag_s2mm_tlast = 1'b0;
+        end
+        else begin
+            // always ready if not reset
+            s20_axis_real_tready = 1'b1;       s20_axis_imag_tready = 1'b1;
+            m20_axis_real_s2mm_tlast <= s20_axis_real_tlast;    m20_axis_imag_s2mm_tlast <= s20_axis_imag_tlast;
+
+            bw20_re <= {{SSAMPLE_WIDTH{bWeight20_real[WEIGHT_WIDTH]}}, bWeight20_real};
+            bw20_im <= {{SSAMPLE_WIDTH{bWeight20_imag[WEIGHT_WIDTH]}}, bWeight20_imag};
+
+            /*------------------------CHANNEL 20 READY/VALID------------------------*/
+            if (m20_axis_real_s2mm_tready && s20_axis_real_tvalid && m20_axis_imag_s2mm_tready && s20_axis_imag_tvalid) begin
+                // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
+                m20_axis_real_s2mm_tkeep <= 16'hffff;   m20_axis_imag_s2mm_tkeep <= 16'hffff;
+                m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
+
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
-                    // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
-                    dataBuffer_SumRe[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
-                                 + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
+                    /* multiply by appropriate weight, accounting for complex/real parts of weight */
+                    // sign extending real and imag parts of slave data for multiplication
+                    // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
+                    s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s20_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s20_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+                    s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s20_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s20_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+
+                    s20_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
+                    s20_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
+
+                    // truncating s20_rr_weighted and s20_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
+                    // enables us to do this because their sign is preserved)
+                    addDataBuffer20_re[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s20_rr_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
+                                                                      - s20_ii_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
+                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
+                    m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer20_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
+
+                    s20_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
+                    s20_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
+
+                    addDataBuffer20_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s20_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
+                                                                      + s20_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
+                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
+                    m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer20_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
+                end
+            end
+            /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
+            else begin 
+                // invalid data, so output data is set to static value of 0
+                m20_axis_real_s2mm_tdata <= 128'b0;
+                m20_axis_imag_s2mm_tdata <= 128'b0;
+
+                // output valid and output tkeep should be low
+                m20_axis_real_s2mm_tvalid <= 1'b0; m20_axis_imag_s2mm_tvalid <= 1'b0;
+                m20_axis_real_s2mm_tkeep <= 1'b0;  m20_axis_imag_s2mm_tkeep <= 1'b0;
+            end
+        end
+    end
+    /*===================================END CHANNEL 20 (ADC B)===================================*/
+
+    /*=====================================CHANNEL 01 (ADC C)=====================================*/
+    always @(posedge clock) begin
+        //~resetn
+        if (resetn == 1'b0) begin
+            // data out, valid, tready, and tlast should all be 0
+            m01_tdata_real <= 128'b0;          m01_tdata_imag <= 128'b0;
+            m01_axis_real_s2mm_tvalid = 1'b0;  m01_axis_imag_s2mm_tvalid = 1'b0;
+            s01_axis_real_tready = 1'b0;       s01_axis_imag_tready = 1'b0;
+            m01_axis_real_s2mm_tlast = 1'b0;   m01_axis_imag_s2mm_tlast = 1'b0;
+        end
+        else begin
+            // always ready if not reset
+            s01_axis_real_tready = 1'b1;       s01_axis_imag_tready = 1'b1;
+            m01_axis_real_s2mm_tlast <= s01_axis_real_tlast;    m01_axis_imag_s2mm_tlast <= s01_axis_imag_tlast;
+
+            bw01_re <= {{SSAMPLE_WIDTH{bWeight01_real[WEIGHT_WIDTH]}}, bWeight01_real};
+            bw01_im <= {{SSAMPLE_WIDTH{bWeight01_imag[WEIGHT_WIDTH]}}, bWeight01_imag};
+
+            /*------------------------CHANNEL 01 READY/VALID------------------------*/
+            if (m01_axis_real_s2mm_tready && s01_axis_real_tvalid && m01_axis_imag_s2mm_tready && s01_axis_imag_tvalid) begin
+                // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
+                m01_axis_real_s2mm_tkeep <= 16'hffff;   m01_axis_imag_s2mm_tkeep <= 16'hffff;
+                m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
+
+                // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
+                for(i=0; i<SAMPLES; i = i+1) begin
+                    /* multiply by appropriate weight, accounting for complex/real parts of weight */
+                    // sign extending real and imag parts of slave data for multiplication
+                    // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
+                    s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s01_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s01_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+                    s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s01_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s01_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+
+                    s01_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
+                    s01_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
+
+                    // truncating s01_rr_weighted and s01_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
+                    // enables us to do this because their sign is preserved)
+                    addDataBuffer01_re[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s01_rr_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
+                                                                      - s01_ii_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
+                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
+                    m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer01_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
+
+                    s01_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
+                    s01_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
+
+                    addDataBuffer01_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s01_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
+                                                                      + s01_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
+                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
+                    m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer01_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
+                end
+            end
+            /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
+            else begin 
+                // invalid data, so output data is set to static value of 0
+                m01_axis_real_s2mm_tdata <= 128'b0;
+                m01_axis_imag_s2mm_tdata <= 128'b0;
+
+                // output valid and output tkeep should be low
+                m01_axis_real_s2mm_tvalid <= 1'b0; m01_axis_imag_s2mm_tvalid <= 1'b0;
+                m01_axis_real_s2mm_tkeep <= 1'b0;  m01_axis_imag_s2mm_tkeep <= 1'b0;
+            end
+        end
+    end
+    /*===================================END CHANNEL 01 (ADC C)===================================*/
+
+    /*=====================================CHANNEL 00 (ADC D)=====================================*/
+    always @(posedge clock) begin
+        //~resetn
+        if (resetn == 1'b0) begin
+            // data out, valid, tready, and tlast should all be 0
+            m00_tdata_real <= 128'b0;          m00_tdata_imag <= 128'b0;
+            m00_axis_real_s2mm_tvalid = 1'b0;  m00_axis_imag_s2mm_tvalid = 1'b0;
+            s00_axis_real_tready = 1'b0;       s00_axis_imag_tready = 1'b0;
+            m00_axis_real_s2mm_tlast = 1'b0;   m00_axis_imag_s2mm_tlast = 1'b0;
+        end
+        else begin
+            // always ready if not reset
+            s00_axis_real_tready = 1'b1;       s00_axis_imag_tready = 1'b1;
+            m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;    m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
+
+            // setting beamforming weight registers for pipelining and sign-extending each for later multiplication
+            bw00_re <= {{SSAMPLE_WIDTH{bWeight00_real[WEIGHT_WIDTH]}}, bWeight00_real};
+            bw00_im <= {{SSAMPLE_WIDTH{bWeight00_imag[WEIGHT_WIDTH]}}, bWeight00_imag};
+
+             /*------------------------CHANNEL 00 READY/VALID------------------------*/
+            if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
+                // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
+                m00_axis_real_s2mm_tkeep <= 16'hffff;   m00_axis_imag_s2mm_tkeep <= 16'hffff;
+                m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
+
+                // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
+                for(i=0; i<SAMPLES; i = i+1) begin
+                    /* multiply by appropriate weight, accounting for complex/real parts of weight */
+                    // sign extending real and imag parts of slave data for multiplication
+                    // also adding 8 LSBS = 0 so when we multiply by the fixed-point weights all the bits line up
+                    s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s00_axis_real_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s00_axis_real_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+                    s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= {{WEIGHT_WIDTH{s00_axis_imag_tdata[(i+1)*SSAMPLE_WIDTH-1]}}, s00_axis_imag_tdata[i*SSAMPLE_WIDTH +: SSAMPLE_WIDTH]};
+
+                    s00_rr_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
+                    s00_ii_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
+
+                    // truncating s00_rr_weighted and s00_ii_weighted by taking the MSBs of size MSAMPLE_WIDTH (sign extension earlier
+                    // enables us to do this because their sign is preserved)
+                    //      KATIE pls double check that verilog will truncate to the LSBs in this assignment (and NOT the MSBs)
+                    addDataBuffer00_re[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s00_rr_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
+                                                                      - s00_ii_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
+                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
+                    m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
+
+                    s00_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
+                    s00_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
+
+                    addDataBuffer00_im[i*(MSAMPLE_WIDTH+1) +: (MSAMPLE_WIDTH+1)] <= s00_ir_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH]
+                                                                      + s00_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
+                    // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
+                    m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
+                end
+            end
+            /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
+            else begin 
+                // invalid data, so output data is set to static value of 0
+                m00_tdata_real <= 128'b0;
+                m00_tdata_imag <= 128'b0;
+
+                // output valid and output tkeep should be low
+                m00_axis_real_s2mm_tvalid <= 1'b0; m00_axis_imag_s2mm_tvalid <= 1'b0;
+                m00_axis_real_s2mm_tkeep <= 1'b0;  m00_axis_imag_s2mm_tkeep <= 1'b0;
+            end
+        end
+    end
+    /*===================================END CHANNEL 00 (ADC D)===================================*/
+
+    /*======================================SUM ALL CHANNELS======================================*/
+    always @(posedge clock) begin
+        //~resetn
+        if (resetn == 1'b0) begin
+            m00_axis_real_s2mm_tdata <= 128'b0; m00_axis_imag_s2mm_tdata <= 128'b0;
+            m01_axis_real_s2mm_tdata <= 128'b0; m01_axis_imag_s2mm_tdata <= 128'b0;
+            m20_axis_real_s2mm_tdata <= 128'b0; m20_axis_imag_s2mm_tdata <= 128'b0;
+            m21_axis_real_s2mm_tdata <= 128'b0; m21_axis_imag_s2mm_tdata <= 128'b0;
+        end
+        if ((s00_axis_real_tready && s00_axis_real_tready) && (s01_axis_real_tready && s01_axis_real_tready) &&
+            (s20_axis_real_tready && s20_axis_real_tready) && (s21_axis_real_tready && s21_axis_real_tready)) begin
+                // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
+                for(i=0; i<SAMPLES; i = i+1) begin
+                    // adding real m00 and m01 data
+                    dataBuffer_SumRe1[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
+                    // adding real m20 and m21 data
+                    dataBuffer_SumRe2[i*SUM_BUFFER +: SUM_BUFFER] <= m20_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     
+                    // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
+                    dataBuffer_SumRe[i*SUM_BUFFER +: SUM_BUFFER] <= dataBuffer_SumRe1[i*SUM_BUFFER +: SUM_BUFFER-1] + dataBuffer_SumRe2[i*SUM_BUFFER +: SUM_BUFFER-1];
                     // sum of real, weighted data (m00 + m01 + m20 + m21)
                     m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[i*SUM_BUFFER +: MSAMPLE_WIDTH];
+
+                    // adding imaginary m00 and m01 data
+                    dataBuffer_SumIm1[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
+                    // adding imaginary m20 and m21 data
+                    dataBuffer_SumIm2[i*SUM_BUFFER +: SUM_BUFFER] <= m20_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     
                     // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
-                    dataBuffer_SumIm[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
-                                                         +  m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
+                    dataBuffer_SumIm[i*SUM_BUFFER +: SUM_BUFFER] <= dataBuffer_SumIm1[i*SUM_BUFFER +: SUM_BUFFER-1] + dataBuffer_SumIm2[i*SUM_BUFFER +: SUM_BUFFER-1];
                     // sum of imaginary, weighted data (m00 + m01 + m20 + m21)
                     m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*SUM_BUFFER +: MSAMPLE_WIDTH];
                 end
+
+                m01_axis_real_s2mm_tdata <= m01_tdata_real; m01_axis_imag_s2mm_tdata <= m01_tdata_imag;
+                m20_axis_real_s2mm_tdata <= m20_tdata_real; m20_axis_imag_s2mm_tdata <= m20_tdata_imag;
+                m21_axis_real_s2mm_tdata <= m21_tdata_real; m21_axis_imag_s2mm_tdata <= m21_tdata_imag;
             end
-            // making sure channel00 has output data if none of the channels have valid data
-            else begin 
-                // invalid data, so output data is set to static value of 0
-                m00_axis_real_s2mm_tdata <= 128'b0;
-                m00_axis_imag_s2mm_tdata <= 128'b0;
-            end
-         end
+        else begin
+            m00_axis_real_s2mm_tdata <= m00_tdata_real; m00_axis_imag_s2mm_tdata <= m00_tdata_imag; 
+            m01_axis_real_s2mm_tdata <= m01_tdata_real; m01_axis_imag_s2mm_tdata <= m01_tdata_imag;
+            m20_axis_real_s2mm_tdata <= m20_tdata_real; m20_axis_imag_s2mm_tdata <= m20_tdata_imag;
+            m21_axis_real_s2mm_tdata <= m21_tdata_real; m21_axis_imag_s2mm_tdata <= m21_tdata_imag;
+        end
     end
-endmodule
