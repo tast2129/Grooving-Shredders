@@ -9,7 +9,7 @@ module axis_adder
     parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
     parameter MDATA_WIDTH = 128,     // MSAMPLE_WIDTH * SAMPLES
     parameter BUFFER_WIDTH = SSAMPLE_WIDTH+WEIGHT_WIDTH,
-    parameter SUM_BUFFER = MSAMPLE_WIDTH+1,
+    parameter SUM_BUFFER = MSAMPLE_WIDTH+3,
     parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH
    ) 
     (
@@ -392,23 +392,16 @@ module axis_adder
             if ((m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid)) begin
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
-                    // adding real m00 and m01 data
-                    dataBuffer_SumRe1[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
-                    // adding real m20 and m21 data
-                    dataBuffer_SumRe2[i*SUM_BUFFER +: SUM_BUFFER] <= m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
-                    
                     // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
-                    dataBuffer_SumRe[i*SUM_BUFFER +: SUM_BUFFER] <= dataBuffer_SumRe1[i*SUM_BUFFER +: SUM_BUFFER-1] + dataBuffer_SumRe2[i*SUM_BUFFER +: SUM_BUFFER-1];
+                    dataBuffer_SumRe[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                                 + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
+                    
                     // sum of real, weighted data (m00 + m01 + m20 + m21)
                     m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[i*SUM_BUFFER +: MSAMPLE_WIDTH];
-
-                    // adding imaginary m00 and m01 data
-                    dataBuffer_SumIm1[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
-                    // adding imaginary m20 and m21 data
-                    dataBuffer_SumIm2[i*SUM_BUFFER +: SUM_BUFFER] <= m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     
                     // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
-                    dataBuffer_SumIm[i*SUM_BUFFER +: SUM_BUFFER] <= dataBuffer_SumIm1[i*SUM_BUFFER +: SUM_BUFFER-1] + dataBuffer_SumIm2[i*SUM_BUFFER +: SUM_BUFFER-1];
+                    dataBuffer_SumIm[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                                                         +  m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     // sum of imaginary, weighted data (m00 + m01 + m20 + m21)
                     m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*SUM_BUFFER +: MSAMPLE_WIDTH];
                 end
