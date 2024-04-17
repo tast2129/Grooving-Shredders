@@ -173,32 +173,32 @@ module axis_adder
         //~resetn
         if (resetn == 1'b0) begin
             // data out, valid, tready, and tlast should all be 0
-            m00_axis_real_s2mm_tdata = 128'b0; m00_axis_imag_s2mm_tdata = 128'b0;
-            m00_axis_real_s2mm_tvalid = 1'b0;  m00_axis_imag_s2mm_tvalid = 1'b0;
-            s00_axis_real_tready = 1'b0;       s00_axis_imag_tready = 1'b0;
-            m00_axis_real_s2mm_tlast = 1'b0;   m00_axis_imag_s2mm_tlast = 1'b0;
+            m00_axis_real_s2mm_tdata <= 128'b0; m00_axis_imag_s2mm_tdata <= 128'b0;
+            m00_axis_real_s2mm_tvalid <= 1'b0;  m00_axis_imag_s2mm_tvalid <= 1'b0;
+            s00_axis_real_tready <= 1'b0;       s00_axis_imag_tready <= 1'b0;
+            m00_axis_real_s2mm_tlast <= 1'b0;   m00_axis_imag_s2mm_tlast <= 1'b0;
 
-            m01_axis_real_s2mm_tdata = 128'b0; m01_axis_imag_s2mm_tdata = 128'b0;
-            m01_axis_real_s2mm_tvalid = 1'b0;  m01_axis_imag_s2mm_tvalid = 1'b0;
-            s01_axis_real_tready = 1'b0;       s01_axis_imag_tready = 1'b0;
-            m01_axis_real_s2mm_tlast = 1'b0;   m01_axis_imag_s2mm_tlast = 1'b0;
+            m01_axis_real_s2mm_tdata <= 128'b0; m01_axis_imag_s2mm_tdata <= 128'b0;
+            m01_axis_real_s2mm_tvalid <= 1'b0;  m01_axis_imag_s2mm_tvalid <= 1'b0;
+            s01_axis_real_tready <= 1'b0;       s01_axis_imag_tready <= 1'b0;
+            m01_axis_real_s2mm_tlast <= 1'b0;   m01_axis_imag_s2mm_tlast <= 1'b0;
 
-            m20_axis_real_s2mm_tdata = 128'b0; m20_axis_imag_s2mm_tdata = 128'b0;
-            m20_axis_real_s2mm_tvalid = 1'b0;  m20_axis_imag_s2mm_tvalid = 1'b0;
-            s20_axis_real_tready = 1'b0;       s20_axis_imag_tready = 1'b0;
-            m20_axis_real_s2mm_tlast = 1'b0;   m20_axis_imag_s2mm_tlast = 1'b0;
+            m20_axis_real_s2mm_tdata <= 128'b0; m20_axis_imag_s2mm_tdata <= 128'b0;
+            m20_axis_real_s2mm_tvalid <= 1'b0;  m20_axis_imag_s2mm_tvalid <= 1'b0;
+            s20_axis_real_tready <= 1'b0;       s20_axis_imag_tready <= 1'b0;
+            m20_axis_real_s2mm_tlast <= 1'b0;   m20_axis_imag_s2mm_tlast <= 1'b0;
 
-            m21_axis_real_s2mm_tdata = 128'b0; m21_axis_imag_s2mm_tdata = 128'b0;
-            m21_axis_real_s2mm_tvalid = 1'b0;  m21_axis_imag_s2mm_tvalid = 1'b0;
-            s21_axis_real_tready = 1'b0;       s21_axis_imag_tready = 1'b0;
-            m21_axis_real_s2mm_tlast = 1'b0;   m21_axis_imag_s2mm_tlast = 1'b0;
+            m21_axis_real_s2mm_tdata <= 128'b0; m21_axis_imag_s2mm_tdata <= 128'b0;
+            m21_axis_real_s2mm_tvalid <= 1'b0;  m21_axis_imag_s2mm_tvalid <= 1'b0;
+            s21_axis_real_tready <= 1'b0;       s21_axis_imag_tready <= 1'b0;
+            m21_axis_real_s2mm_tlast <= 1'b0;   m21_axis_imag_s2mm_tlast <= 1'b0;
         end
         else begin
             // always ready if not reset
-            s00_axis_real_tready = 1'b1;       s00_axis_imag_tready = 1'b1;
-            s01_axis_real_tready = 1'b1;       s01_axis_imag_tready = 1'b1;
-            s20_axis_real_tready = 1'b1;       s20_axis_imag_tready = 1'b1;
-            s21_axis_real_tready = 1'b1;       s21_axis_imag_tready = 1'b1;
+            s00_axis_real_tready <= 1'b1;       s00_axis_imag_tready <= 1'b1;
+            s01_axis_real_tready <= 1'b1;       s01_axis_imag_tready <= 1'b1;
+            s20_axis_real_tready <= 1'b1;       s20_axis_imag_tready <= 1'b1;
+            s21_axis_real_tready <= 1'b1;       s21_axis_imag_tready <= 1'b1;
 
             m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;    m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
             m01_axis_real_s2mm_tlast <= s01_axis_real_tlast;    m01_axis_imag_s2mm_tlast <= s01_axis_imag_tlast;

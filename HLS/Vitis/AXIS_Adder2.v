@@ -177,10 +177,10 @@ module axis_adder
         //~resetn
         if (resetn == 1'b0) begin
             // data out, valid, tready, and tlast should all be 0
-            m21_tdata_real <= 128'b0;          m21_tdata_imag <= 128'b0;
-            m21_axis_real_s2mm_tvalid = 1'b0;  m21_axis_imag_s2mm_tvalid = 1'b0;
-            s21_axis_real_tready = 1'b0;       s21_axis_imag_tready = 1'b0;
-            m21_axis_real_s2mm_tlast = 1'b0;   m21_axis_imag_s2mm_tlast = 1'b0;
+            m21_tdata_real <= 128'b0;           m21_tdata_imag <= 128'b0;
+            m21_axis_real_s2mm_tvalid <= 1'b0;  m21_axis_imag_s2mm_tvalid <= 1'b0;
+            s21_axis_real_tready <= 1'b0;       s21_axis_imag_tready <= 1'b0;
+            m21_axis_real_s2mm_tlast <= 1'b0;   m21_axis_imag_s2mm_tlast <= 1'b0;
         end
         else begin
             // always ready if not reset
@@ -242,10 +242,10 @@ module axis_adder
         //~resetn
         if (resetn == 1'b0) begin
             // data out, valid, tready, and tlast should all be 0
-            m20_tdata_real <= 128'b0;          m20_tdata_imag <= 128'b0;
-            m20_axis_real_s2mm_tvalid = 1'b0;  m20_axis_imag_s2mm_tvalid = 1'b0;
-            s20_axis_real_tready = 1'b0;       s20_axis_imag_tready = 1'b0;
-            m20_axis_real_s2mm_tlast = 1'b0;   m20_axis_imag_s2mm_tlast = 1'b0;
+            m20_tdata_real <= 128'b0;           m20_tdata_imag <= 128'b0;
+            m20_axis_real_s2mm_tvalid <= 1'b0;  m20_axis_imag_s2mm_tvalid <= 1'b0;
+            s20_axis_real_tready <= 1'b0;       s20_axis_imag_tready <= 1'b0;
+            m20_axis_real_s2mm_tlast <= 1'b0;   m20_axis_imag_s2mm_tlast <= 1'b0;
         end
         else begin
             // always ready if not reset
@@ -445,31 +445,40 @@ module axis_adder
         end
         if ((s00_axis_real_tready && s00_axis_real_tready) && (s01_axis_real_tready && s01_axis_real_tready) &&
             (s20_axis_real_tready && s20_axis_real_tready) && (s21_axis_real_tready && s21_axis_real_tready)) begin
-                // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
-                for(i=0; i<SAMPLES; i = i+1) begin
-                    // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
-                    dataBuffer_SumRe[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
-                                 + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
+            // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
+            for(i=0; i<SAMPLES; i = i+1) begin
+                // NOTE: we're not gonna worry about bit overflow in these two summing operations because we think our sample data will be small
+                // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
+                dataBuffer_SumRe[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                             + m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     
-                    // sum of real, weighted data (m00 + m01 + m20 + m21)
-                    m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[i*SUM_BUFFER +: MSAMPLE_WIDTH];
+                // sum of real, weighted data (m00 + m01 + m20 + m21)
+                m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[i*SUM_BUFFER +: MSAMPLE_WIDTH];
                     
-                    // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
-                    dataBuffer_SumIm[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
+                // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
+                dataBuffer_SumIm[i*SUM_BUFFER +: SUM_BUFFER] <= m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                                                          +  m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
-                    // sum of imaginary, weighted data (m00 + m01 + m20 + m21)
-                    m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*SUM_BUFFER +: MSAMPLE_WIDTH];
-                end
-
-                m01_axis_real_s2mm_tdata <= m01_tdata_real; m01_axis_imag_s2mm_tdata <= m01_tdata_imag;
-                m20_axis_real_s2mm_tdata <= m20_tdata_real; m20_axis_imag_s2mm_tdata <= m20_tdata_imag;
-                m21_axis_real_s2mm_tdata <= m21_tdata_real; m21_axis_imag_s2mm_tdata <= m21_tdata_imag;
+                // sum of imaginary, weighted data (m00 + m01 + m20 + m21)
+                m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*SUM_BUFFER +: MSAMPLE_WIDTH];
+            end else begin
+                m00_tdata_real <=;
+                m00_tdata_imag <=; 
+                m01_tdata_real <=;
+                m01_tdata_imag <=;
+                m20_tdata_real <=; 
+                m20_tdata_imag <=;
+                m21_tdata_real <=;
+                m21_tdata_imag <=;
             end
-        else begin
-            m00_axis_real_s2mm_tdata <= m00_tdata_real; m00_axis_imag_s2mm_tdata <= m00_tdata_imag; 
-            m01_axis_real_s2mm_tdata <= m01_tdata_real; m01_axis_imag_s2mm_tdata <= m01_tdata_imag;
-            m20_axis_real_s2mm_tdata <= m20_tdata_real; m20_axis_imag_s2mm_tdata <= m20_tdata_imag;
-            m21_axis_real_s2mm_tdata <= m21_tdata_real; m21_axis_imag_s2mm_tdata <= m21_tdata_imag;
         end
     end
+
+    assign m00_axis_real_s2mm_tdata <= m00_tdata_real;
+    assign m00_axis_imag_s2mm_tdata <= m00_tdata_imag; 
+    assign m01_axis_real_s2mm_tdata <= m01_tdata_real;
+    assign m01_axis_imag_s2mm_tdata <= m01_tdata_imag;
+    assign m20_axis_real_s2mm_tdata <= m20_tdata_real; 
+    assign m20_axis_imag_s2mm_tdata <= m20_tdata_imag;
+    assign m21_axis_real_s2mm_tdata <= m21_tdata_real;
+    assign m21_axis_imag_s2mm_tdata <= m21_tdata_imag;
 endmodule
