@@ -481,14 +481,14 @@ module axis_adder
                 m21_tdata_imag <= m21_tdata_imBuf;
             end
         end
+        
+        m00_axis_real_s2mm_tdata <= m00_tdata_real;
+        m00_axis_imag_s2mm_tdata <= m00_tdata_imag; 
+        m01_axis_real_s2mm_tdata <= m01_tdata_real;
+        m01_axis_imag_s2mm_tdata <= m01_tdata_imag;
+        m20_axis_real_s2mm_tdata <= m20_tdata_real; 
+        m20_axis_imag_s2mm_tdata <= m20_tdata_imag;
+        m21_axis_real_s2mm_tdata <= m21_tdata_real;
+        m21_axis_imag_s2mm_tdata <= m21_tdata_imag;
     end
-
-    assign m00_axis_real_s2mm_tdata = m00_tdata_real;
-    assign m00_axis_imag_s2mm_tdata = m00_tdata_imag; 
-    assign m01_axis_real_s2mm_tdata = m01_tdata_real;
-    assign m01_axis_imag_s2mm_tdata = m01_tdata_imag;
-    assign m20_axis_real_s2mm_tdata = m20_tdata_real; 
-    assign m20_axis_imag_s2mm_tdata = m20_tdata_imag;
-    assign m21_axis_real_s2mm_tdata = m21_tdata_real;
-    assign m21_axis_imag_s2mm_tdata = m21_tdata_imag;
 endmodule
