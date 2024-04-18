@@ -167,6 +167,12 @@ module axis_adder
     reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_rr_weighted = 0;  reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_ii_weighted = 0;
     reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_ri_weighted = 0;  reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_ir_weighted = 0;
 
+    // buffers for tlast
+    reg [SAMPLES-1:0] m00_tlast_re = 0;     reg [SAMPLES-1:0] m00_tlast_im = 0;
+    reg [SAMPLES-1:0] m01_tlast_re = 0;     reg [SAMPLES-1:0] m01_tlast_im = 0;
+    reg [SAMPLES-1:0] m20_tlast_re = 0;     reg [SAMPLES-1:0] m20_tlast_im = 0;
+    reg [SAMPLES-1:0] m21_tlast_re = 0;     reg [SAMPLES-1:0] m21_tlast_im = 0;
+
     // pipelining for beamforming weights
     reg [BUFFER_WIDTH-1:0] bw00_re = 0;  reg [BUFFER_WIDTH-1:0] bw00_im = 0;
     reg [BUFFER_WIDTH-1:0] bw01_re = 0;  reg [BUFFER_WIDTH-1:0] bw01_im = 0;
@@ -237,6 +243,8 @@ module axis_adder
                                                                       - s00_ii_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
+
+                    
 
                     s00_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
                     s00_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
