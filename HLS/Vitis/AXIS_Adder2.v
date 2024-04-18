@@ -1,5 +1,6 @@
 /* 
  * AXI stream multiplier block taking 128-bit input data and 8-bit beamforming weight to apply to data
+ * This zeros out all of the data coming from every ADC :( I'm just a little sad
 */
 module axis_adder
   #(

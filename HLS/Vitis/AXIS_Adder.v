@@ -389,8 +389,8 @@ module axis_adder
                 m21_axis_real_s2mm_tkeep <= 1'b0;  m21_axis_imag_s2mm_tkeep <= 1'b0;
             end
 
-            if ((s00_axis_real_tready && s00_axis_real_tready) && (s01_axis_real_tready && s01_axis_real_tready) &&
-                (s20_axis_real_tready && s20_axis_real_tready) && (s21_axis_real_tready && s21_axis_real_tready)) begin
+            if ((m00_axis_real_s2mm_tvalid && m00_axis_imag_s2mm_tvalid) || (m01_axis_real_s2mm_tvalid && m01_axis_imag_s2mm_tvalid) ||
+                (m20_axis_real_s2mm_tvalid && m20_axis_imag_s2mm_tvalid) || (m21_axis_real_s2mm_tvalid && m21_axis_imag_s2mm_tvalid)) begin
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
                     // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
