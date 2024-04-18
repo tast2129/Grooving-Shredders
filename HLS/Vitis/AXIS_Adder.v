@@ -204,11 +204,6 @@ module axis_adder
             s20_axis_real_tready <= 1'b1;       s20_axis_imag_tready <= 1'b1;
             s21_axis_real_tready <= 1'b1;       s21_axis_imag_tready <= 1'b1;
 
-            m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;    m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
-            m01_axis_real_s2mm_tlast <= s01_axis_real_tlast;    m01_axis_imag_s2mm_tlast <= s01_axis_imag_tlast;
-            m20_axis_real_s2mm_tlast <= s20_axis_real_tlast;    m20_axis_imag_s2mm_tlast <= s20_axis_imag_tlast;
-            m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
-
             // setting beamforming weight registers for pipelining and sign-extending each for later multiplication
             bw00_re <= {{SSAMPLE_WIDTH{bWeight00_real[WEIGHT_WIDTH]}}, bWeight00_real};
             bw00_im <= {{SSAMPLE_WIDTH{bWeight00_imag[WEIGHT_WIDTH]}}, bWeight00_imag};
@@ -298,6 +293,8 @@ module axis_adder
 
                 m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
                 m01_valid <= m01_axis_real_s2mm_tvalid && m01_axis_imag_s2mm_tvalid;
+
+                m01_axis_real_s2mm_tlast <= s01_axis_real_tlast;    m01_axis_imag_s2mm_tlast <= s01_axis_imag_tlast;
             end
             /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
             else begin 
@@ -343,6 +340,8 @@ module axis_adder
 
                 m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
                 m20_valid <= m20_axis_real_s2mm_tvalid && m20_axis_imag_s2mm_tvalid;
+                
+                m20_axis_real_s2mm_tlast <= s20_axis_real_tlast;    m20_axis_imag_s2mm_tlast <= s20_axis_imag_tlast;
             end
             /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
             else begin 
@@ -388,6 +387,8 @@ module axis_adder
 
                 m21_axis_real_s2mm_tvalid <= 1'b1;      m21_axis_imag_s2mm_tvalid <= 1'b1;
                 m21_valid <= m21_axis_real_s2mm_tvalid && m21_axis_imag_s2mm_tvalid;
+
+                m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
             end
             /*----------------------CHANNEL 21 NOT READY/VALID----------------------*/
             else begin 
@@ -418,6 +419,8 @@ module axis_adder
                 end
 
                 m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
+                m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;    m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
+
             end
             // making sure channel00 has output data if none of the channels have valid data
             else begin 
