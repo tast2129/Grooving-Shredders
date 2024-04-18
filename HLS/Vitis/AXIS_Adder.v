@@ -151,6 +151,10 @@ module axis_adder
 
     // pipelining for channel00 because it's the channel we're writing the summed & weighted data to
     reg [MDATA_WIDTH-1:0]m00_tdata_real = 0; reg [MDATA_WIDTH-1:0]m00_tdata_imag = 0;
+    reg m00_valid = 0;
+    reg m01_valid = 0;
+    reg m20_valid = 0;
+    reg m21_valid = 0;
 
     // buffers for multiplication (for applying beamforming weights)
     //        reg [(BUFFER_WIDTH*SAMPLES)-1:0]s00_rr_weighted = reg [((16+8)*8)-1:0]s00_rr_weighted
@@ -219,7 +223,6 @@ module axis_adder
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m00_axis_real_s2mm_tkeep <= 16'hffff;   m00_axis_imag_s2mm_tkeep <= 16'hffff;
-                m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
@@ -248,6 +251,8 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
                 end
+
+                m00_valid <= 1'b1;
             end
             /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
             else begin 
@@ -263,7 +268,6 @@ module axis_adder
             if (m01_axis_real_s2mm_tready && s01_axis_real_tvalid && m01_axis_imag_s2mm_tready && s01_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m01_axis_real_s2mm_tkeep <= 16'hffff;   m01_axis_imag_s2mm_tkeep <= 16'hffff;
-                m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
@@ -291,6 +295,9 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer01_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
                 end
+
+                m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
+                m01_valid <= m01_axis_real_s2mm_tvalid && m01_axis_imag_s2mm_tvalid;
             end
             /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
             else begin 
@@ -306,7 +313,6 @@ module axis_adder
             if (m20_axis_real_s2mm_tready && s20_axis_real_tvalid && m20_axis_imag_s2mm_tready && s20_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m20_axis_real_s2mm_tkeep <= 16'hffff;   m20_axis_imag_s2mm_tkeep <= 16'hffff;
-                m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
@@ -334,6 +340,9 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer20_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
                 end
+
+                m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
+                m20_valid <= m20_axis_real_s2mm_tvalid && m20_axis_imag_s2mm_tvalid;
             end
             /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
             else begin 
@@ -349,7 +358,6 @@ module axis_adder
             if (m21_axis_real_s2mm_tready && s21_axis_real_tvalid && m21_axis_imag_s2mm_tready && s21_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
                 m21_axis_real_s2mm_tkeep <= 16'hffff;   m21_axis_imag_s2mm_tkeep <= 16'hffff;
-                m21_axis_real_s2mm_tvalid <= 1'b1;      m21_axis_imag_s2mm_tvalid <= 1'b1;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
@@ -377,6 +385,9 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer21_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
                 end
+
+                m21_axis_real_s2mm_tvalid <= 1'b1;      m21_axis_imag_s2mm_tvalid <= 1'b1;
+                m21_valid <= m21_axis_real_s2mm_tvalid && m21_axis_imag_s2mm_tvalid;
             end
             /*----------------------CHANNEL 21 NOT READY/VALID----------------------*/
             else begin 
@@ -389,8 +400,7 @@ module axis_adder
                 m21_axis_real_s2mm_tkeep <= 1'b0;  m21_axis_imag_s2mm_tkeep <= 1'b0;
             end
 
-            if ((m00_axis_real_s2mm_tvalid && m00_axis_imag_s2mm_tvalid) || (m01_axis_real_s2mm_tvalid && m01_axis_imag_s2mm_tvalid) ||
-                (m20_axis_real_s2mm_tvalid && m20_axis_imag_s2mm_tvalid) || (m21_axis_real_s2mm_tvalid && m21_axis_imag_s2mm_tvalid)) begin
+            if (m00_valid && m01_valid && m20_valid && m21_valid) begin
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
                     // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
@@ -406,9 +416,12 @@ module axis_adder
                     // sum of imaginary, weighted data (m00 + m01 + m20 + m21)
                     m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*SUM_BUFFER +: MSAMPLE_WIDTH];
                 end
+
+                m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
             end
             // making sure channel00 has output data if none of the channels have valid data
             else begin 
+                m00_axis_real_s2mm_tvalid <= 1'b0;      m00_axis_imag_s2mm_tvalid <= 1'b0;
                 // invalid data, so output data is set to static value of 0
                 m00_axis_real_s2mm_tdata <= 128'b0;
                 m00_axis_imag_s2mm_tdata <= 128'b0;
