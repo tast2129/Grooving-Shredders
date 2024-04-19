@@ -168,10 +168,10 @@ module axis_adder
     reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_ri_weighted = 0;  reg [(BUFFER_WIDTH*SAMPLES)-1:0]s21_ir_weighted = 0;
 
     // buffers for tlast
-    reg [SAMPLES-1:0] m00_tlast_re = 0;     reg [SAMPLES-1:0] m00_tlast_im = 0;
-    reg [SAMPLES-1:0] m01_tlast_re = 0;     reg [SAMPLES-1:0] m01_tlast_im = 0;
-    reg [SAMPLES-1:0] m20_tlast_re = 0;     reg [SAMPLES-1:0] m20_tlast_im = 0;
-    reg [SAMPLES-1:0] m21_tlast_re = 0;     reg [SAMPLES-1:0] m21_tlast_im = 0;
+    reg [SAMPLES:0] m00_tlast_re = 0;     reg [SAMPLES:0] m00_tlast_im = 0;
+    reg [SAMPLES:0] m01_tlast_re = 0;     reg [SAMPLES:0] m01_tlast_im = 0;
+    reg [SAMPLES:0] m20_tlast_re = 0;     reg [SAMPLES:0] m20_tlast_im = 0;
+    reg [SAMPLES:0] m21_tlast_re = 0;     reg [SAMPLES:0] m21_tlast_im = 0;
 
     // pipelining for beamforming weights
     reg [BUFFER_WIDTH-1:0] bw00_re = 0;  reg [BUFFER_WIDTH-1:0] bw00_im = 0;
@@ -210,6 +210,16 @@ module axis_adder
             s20_axis_real_tready <= 1'b1;       s20_axis_imag_tready <= 1'b1;
             s21_axis_real_tready <= 1'b1;       s21_axis_imag_tready <= 1'b1;
 
+            m00_tlast_re[0] <= s00_axis_real_tlast;
+            m01_tlast_re[0] <= s01_axis_real_tlast;
+            m20_tlast_re[0] <= s20_axis_real_tlast;
+            m21_tlast_re[0] <= s21_axis_real_tlast;
+
+            m00_tlast_im[0] <= s00_axis_imag_tlast;
+            m01_tlast_im[0] <= s01_axis_imag_tlast;
+            m20_tlast_im[0] <= s20_axis_imag_tlast;
+            m21_tlast_im[0] <= s21_axis_imag_tlast;
+            
             // setting beamforming weight registers for pipelining and sign-extending each for later multiplication
             bw00_re <= {{SSAMPLE_WIDTH{bWeight00_real[WEIGHT_WIDTH]}}, bWeight00_real};
             bw00_im <= {{SSAMPLE_WIDTH{bWeight00_imag[WEIGHT_WIDTH]}}, bWeight00_imag};
@@ -244,7 +254,7 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m00_tdata_real[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
 
-                    
+                    m00_tlast_re[i+1] <= m00_tlast_re[i];
 
                     s00_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_im;
                     s00_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s00_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw00_re;
@@ -253,6 +263,8 @@ module axis_adder
                                                                       + s00_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m00_tdata_imag[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer00_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
+
+                    m00_tlast_im[i+1] <= m00_tlast_im[i];
                 end
 
                 m00_valid <= 1'b1;
@@ -290,6 +302,8 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m01_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer01_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
 
+                    m01_tlast_re[i+1] <= m01_tlast_re[i];
+
                     s01_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_im;
                     s01_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s01_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw01_re;
 
@@ -297,12 +311,14 @@ module axis_adder
                                                                       + s01_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m01_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer01_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
+
+                    m01_tlast_im[i+1] <= m01_tlast_im[i];
                 end
 
                 m01_axis_real_s2mm_tvalid <= 1'b1;      m01_axis_imag_s2mm_tvalid <= 1'b1;
                 m01_valid <= m01_axis_real_s2mm_tvalid && m01_axis_imag_s2mm_tvalid;
 
-                m01_axis_real_s2mm_tlast <= s01_axis_real_tlast;    m01_axis_imag_s2mm_tlast <= s01_axis_imag_tlast;
+                m01_axis_real_s2mm_tlast <= m01_tlast_re[SAMPLES];    m01_axis_imag_s2mm_tlast <= m01_tlast_im[SAMPLES];
             end
             /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
             else begin 
@@ -337,6 +353,8 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m20_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer20_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
 
+                    m20_tlast_re[i+1] <= m20_tlast_re[i];
+
                     s20_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_im;
                     s20_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s20_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw20_re;
 
@@ -344,12 +362,14 @@ module axis_adder
                                                                       + s20_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m20_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer20_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
+
+                    m20_tlast_im[i+1] <= m20_tlast_im[i];
                 end
 
                 m20_axis_real_s2mm_tvalid <= 1'b1;      m20_axis_imag_s2mm_tvalid <= 1'b1;
                 m20_valid <= m20_axis_real_s2mm_tvalid && m20_axis_imag_s2mm_tvalid;
                 
-                m20_axis_real_s2mm_tlast <= s20_axis_real_tlast;    m20_axis_imag_s2mm_tlast <= s20_axis_imag_tlast;
+                m20_axis_real_s2mm_tlast <= m20_tlast_re[SAMPLES];    m20_axis_imag_s2mm_tlast <= m20_tlast_im[SAMPLES];
             end
             /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
             else begin 
@@ -384,6 +404,8 @@ module axis_adder
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m21_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer21_re[i*(MSAMPLE_WIDTH+1)+1 +: MSAMPLE_WIDTH];
 
+                    m21_tlast_re[i+1] <= m21_tlast_re[i];
+
                     s21_ir_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_real[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_im;
                     s21_ri_weighted[i*BUFFER_WIDTH +: BUFFER_WIDTH] <= s21_tdata_imag[i*BUFFER_WIDTH +: BUFFER_WIDTH]*bw21_re;
 
@@ -391,12 +413,14 @@ module axis_adder
                                                                       + s21_ri_weighted[(i*BUFFER_WIDTH)+WEIGHT_WIDTH +: MSAMPLE_WIDTH];
                     // truncating addDataBuffer by taking the LSBs of size MSAMPLE_WIDTH (twos complement addition preserves sign)
                     m21_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer21_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
+
+                    m21_tlast_im[i+1] <= m21_tlast_im[i];
                 end
 
                 m21_axis_real_s2mm_tvalid <= 1'b1;      m21_axis_imag_s2mm_tvalid <= 1'b1;
                 m21_valid <= m21_axis_real_s2mm_tvalid && m21_axis_imag_s2mm_tvalid;
 
-                m21_axis_real_s2mm_tlast <= s21_axis_real_tlast;    m21_axis_imag_s2mm_tlast <= s21_axis_imag_tlast;
+                m21_axis_real_s2mm_tlast <= m21_tlast_re[SAMPLES];    m21_axis_imag_s2mm_tlast <= m21_tlast_im[SAMPLES];
             end
             /*----------------------CHANNEL 21 NOT READY/VALID----------------------*/
             else begin 
@@ -427,7 +451,7 @@ module axis_adder
                 end
 
                 m00_axis_real_s2mm_tvalid <= 1'b1;      m00_axis_imag_s2mm_tvalid <= 1'b1;
-                m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;    m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
+                m00_axis_real_s2mm_tlast <= m00_tlast_re[SAMPLES];    m00_axis_imag_s2mm_tlast <= m00_tlast_im[SAMPLES];
 
             end
             // making sure channel00 has output data if none of the channels have valid data
