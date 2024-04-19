@@ -119,6 +119,9 @@ module axis_adder
     // reg [((SSAMPLE_WIDTH+3)-1)*SAMPLES:0]dataBuffer_Sum;
     reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumRe = 0;
     reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumIm = 0;
+    
+    // buffers for tlast
+    reg [SAMPLES:0] m00_tlast_re = 0;     reg [SAMPLES:0] m00_tlast_im = 0;
 
     always @(posedge clock) begin
         //~resetn

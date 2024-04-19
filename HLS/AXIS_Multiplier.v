@@ -67,6 +67,8 @@ module axis_multiplier
     reg [MDATA_WIDTH-1:0]m_tdata_reBuf = 0; reg [MDATA_WIDTH-1:0]m_tdata_imBuf = 0;
     reg [BUFFER_WIDTH-1:0] bw_re = 0;       reg [BUFFER_WIDTH-1:0] bw_im = 0;
     reg m00_valid = 0;
+    // buffers for tlast
+    reg [SAMPLES:0] m_tlast_re = 0;     reg [SAMPLES:0] m_tlast_im = 0;
 
     // buffers for multiplication (for applying beamforming weights)
     //        reg [(BUFFER_WIDTH*SAMPLES)-1:0]s00_rr_weighted = reg [((16+8)*8)-1:0]s00_rr_weighted
