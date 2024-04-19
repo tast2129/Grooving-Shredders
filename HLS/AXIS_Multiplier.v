@@ -81,7 +81,7 @@ module axis_multiplier
             m_axis_real_s2mm_tvalid <= 1'b0;            m_axis_imag_s2mm_tvalid <= 1'b0;
             s_axis_real_tready <= 1'b0;                 s_axis_imag_tready <= 1'b0;
             m_axis_real_s2mm_tlast <= 1'b0;             m_axis_imag_s2mm_tlast <= 1'b0;
-        else begin
+        end else begin
             // always ready if not reset
             s_axis_real_tready <= 1'b1;       s_axis_imag_tready <= 1'b1; // Q: is there a reason we're not setting this to the input tready?
 
