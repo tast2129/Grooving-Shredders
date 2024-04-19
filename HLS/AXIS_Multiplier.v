@@ -1,7 +1,7 @@
 /* 
  * AXI stream multiplier block taking 128-bit input data and 8-bit beamforming weight to apply to data
  */
-module axis_adder
+module axis_multiplier
   #(
     parameter SDATA_WIDTH = 128,
     parameter SSAMPLE_WIDTH = 16,

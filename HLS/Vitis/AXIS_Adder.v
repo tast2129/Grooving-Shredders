@@ -137,11 +137,7 @@ module axis_adder
 
     // reg [((SSAMPLE_WIDTH+3)-1)*SAMPLES:0]dataBuffer_Sum;
     reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumRe = 0;
-    reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumRe1 = 0;
-    reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumRe2 = 0;
     reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumIm = 0;
-    reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumIm1 = 0;
-    reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumIm2 = 0;
 
     // this data buffer is for adding the real parts (or imaginary parts) for complex multiplication after they're weighted
     reg [((MSAMPLE_WIDTH+1)*SAMPLES)-1:0]addDataBuffer00_re; reg [((MSAMPLE_WIDTH+1)*SAMPLES)-1:0]addDataBuffer00_im;
@@ -183,26 +179,26 @@ module axis_adder
         //~resetn
         if (resetn == 1'b0) begin
             // data out, valid, tready, and tlast should all be 0
-            m00_axis_real_s2mm_tdata <= 128'b0; m00_axis_imag_s2mm_tdata <= 128'b0;
-            m00_axis_real_s2mm_tvalid <= 1'b0;  m00_axis_imag_s2mm_tvalid <= 1'b0;
-            s00_axis_real_tready <= 1'b0;       s00_axis_imag_tready <= 1'b0;
-            m00_axis_real_s2mm_tlast <= 1'b0;   m00_axis_imag_s2mm_tlast <= 1'b0;
+            m00_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};   m00_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
+            m00_axis_real_s2mm_tvalid <= 1'b0;              m00_axis_imag_s2mm_tvalid <= 1'b0;
+            s00_axis_real_tready <= 1'b0;                   s00_axis_imag_tready <= 1'b0;
+            m00_axis_real_s2mm_tlast <= 1'b0;               m00_axis_imag_s2mm_tlast <= 1'b0;
 
-            m01_axis_real_s2mm_tdata <= 128'b0; m01_axis_imag_s2mm_tdata <= 128'b0;
-            m01_axis_real_s2mm_tvalid <= 1'b0;  m01_axis_imag_s2mm_tvalid <= 1'b0;
-            s01_axis_real_tready <= 1'b0;       s01_axis_imag_tready <= 1'b0;
-            m01_axis_real_s2mm_tlast <= 1'b0;   m01_axis_imag_s2mm_tlast <= 1'b0;
+            m01_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};   m01_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
+            m01_axis_real_s2mm_tvalid <= 1'b0;              m01_axis_imag_s2mm_tvalid <= 1'b0;
+            s01_axis_real_tready <= 1'b0;                   s01_axis_imag_tready <= 1'b0;
+            m01_axis_real_s2mm_tlast <= 1'b0;               m01_axis_imag_s2mm_tlast <= 1'b0;
 
-            m20_axis_real_s2mm_tdata <= 128'b0; m20_axis_imag_s2mm_tdata <= 128'b0;
-            m20_axis_real_s2mm_tvalid <= 1'b0;  m20_axis_imag_s2mm_tvalid <= 1'b0;
-            s20_axis_real_tready <= 1'b0;       s20_axis_imag_tready <= 1'b0;
-            m20_axis_real_s2mm_tlast <= 1'b0;   m20_axis_imag_s2mm_tlast <= 1'b0;
+            m20_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};   m20_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
+            m20_axis_real_s2mm_tvalid <= 1'b0;              m20_axis_imag_s2mm_tvalid <= 1'b0;
+            s20_axis_real_tready <= 1'b0;                   s20_axis_imag_tready <= 1'b0;
+            m20_axis_real_s2mm_tlast <= 1'b0;               m20_axis_imag_s2mm_tlast <= 1'b0;
 
-            m21_axis_real_s2mm_tdata <= 128'b0; m21_axis_imag_s2mm_tdata <= 128'b0;
-            m21_axis_real_s2mm_tvalid <= 1'b0;  m21_axis_imag_s2mm_tvalid <= 1'b0;
-            s21_axis_real_tready <= 1'b0;       s21_axis_imag_tready <= 1'b0;
-            m21_axis_real_s2mm_tlast <= 1'b0;   m21_axis_imag_s2mm_tlast <= 1'b0;
-        end
+            m21_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};   m21_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
+            m21_axis_real_s2mm_tvalid <= 1'b0;              m21_axis_imag_s2mm_tvalid <= 1'b0;
+            s21_axis_real_tready <= 1'b0;                   s21_axis_imag_tready <= 1'b0;
+            m21_axis_real_s2mm_tlast <= 1'b0;               m21_axis_imag_s2mm_tlast <= 1'b0;
+        end 
         else begin
             // always ready if not reset
             s00_axis_real_tready <= 1'b1;       s00_axis_imag_tready <= 1'b1;
@@ -233,7 +229,7 @@ module axis_adder
             /*------------------------CHANNEL 00 READY/VALID------------------------*/
             if (m00_axis_real_s2mm_tready && s00_axis_real_tvalid && m00_axis_imag_s2mm_tready && s00_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
-                m00_axis_real_s2mm_tkeep <= 16'hffff;   m00_axis_imag_s2mm_tkeep <= 16'hffff;
+                m00_axis_real_s2mm_tkeep <= {SAMPLES{1}};   m00_axis_imag_s2mm_tkeep <= {SAMPLES{1}};
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
@@ -272,8 +268,8 @@ module axis_adder
             /*----------------------CHANNEL 00 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m00_tdata_real <= 128'b0;
-                m00_tdata_imag <= 128'b0;
+                m00_tdata_real <= {MDATA_WIDTH{0}};
+                m00_tdata_imag <= {MDATA_WIDTH{0}};
 
                 // output valid and output tkeep should be low
                 m00_axis_real_s2mm_tvalid <= 1'b0; m00_axis_imag_s2mm_tvalid <= 1'b0;
@@ -282,7 +278,7 @@ module axis_adder
             /*------------------------CHANNEL 01 READY/VALID------------------------*/
             if (m01_axis_real_s2mm_tready && s01_axis_real_tvalid && m01_axis_imag_s2mm_tready && s01_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
-                m01_axis_real_s2mm_tkeep <= 16'hffff;   m01_axis_imag_s2mm_tkeep <= 16'hffff;
+                m01_axis_real_s2mm_tkeep <= {SAMPLES{1}};   m01_axis_imag_s2mm_tkeep <= {SAMPLES{1}};
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
@@ -323,8 +319,8 @@ module axis_adder
             /*----------------------CHANNEL 01 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m01_axis_real_s2mm_tdata <= 128'b0;
-                m01_axis_imag_s2mm_tdata <= 128'b0;
+                m01_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};
+                m01_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
 
                 // output valid and output tkeep should be low
                 m01_axis_real_s2mm_tvalid <= 1'b0; m01_axis_imag_s2mm_tvalid <= 1'b0;
@@ -333,7 +329,7 @@ module axis_adder
             /*------------------------CHANNEL 20 READY/VALID------------------------*/
             if (m20_axis_real_s2mm_tready && s20_axis_real_tvalid && m20_axis_imag_s2mm_tready && s20_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
-                m20_axis_real_s2mm_tkeep <= 16'hffff;   m20_axis_imag_s2mm_tkeep <= 16'hffff;
+                m20_axis_real_s2mm_tkeep <= {SAMPLES{1}};   m20_axis_imag_s2mm_tkeep <= {SAMPLES{1}};
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
@@ -374,8 +370,8 @@ module axis_adder
             /*----------------------CHANNEL 20 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m20_axis_real_s2mm_tdata <= 128'b0;
-                m20_axis_imag_s2mm_tdata <= 128'b0;
+                m20_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};
+                m20_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
 
                 // output valid and output tkeep should be low
                 m20_axis_real_s2mm_tvalid <= 1'b0; m20_axis_imag_s2mm_tvalid <= 1'b0;
@@ -384,7 +380,7 @@ module axis_adder
             /*------------------------CHANNEL 21 READY/VALID------------------------*/
             if (m21_axis_real_s2mm_tready && s21_axis_real_tvalid && m21_axis_imag_s2mm_tready && s21_axis_imag_tvalid) begin
                 // tkeep and tvalid are now high (tkeep = 16'hffff, tvalid = 1'b1)
-                m21_axis_real_s2mm_tkeep <= 16'hffff;   m21_axis_imag_s2mm_tkeep <= 16'hffff;
+                m21_axis_real_s2mm_tkeep <= {SAMPLES{1}};   m21_axis_imag_s2mm_tkeep <= {SAMPLES{1}};
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
                 for(i=0; i<SAMPLES; i = i+1) begin
@@ -425,8 +421,8 @@ module axis_adder
             /*----------------------CHANNEL 21 NOT READY/VALID----------------------*/
             else begin 
                 // invalid data, so output data is set to static value of 0
-                m21_axis_real_s2mm_tdata <= 128'b0;
-                m21_axis_imag_s2mm_tdata <= 128'b0;
+                m21_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};
+                m21_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
 
                 // output valid and output tkeep should be low
                 m21_axis_real_s2mm_tvalid <= 1'b0; m21_axis_imag_s2mm_tvalid <= 1'b0;
@@ -458,8 +454,8 @@ module axis_adder
             else begin 
                 m00_axis_real_s2mm_tvalid <= 1'b0;      m00_axis_imag_s2mm_tvalid <= 1'b0;
                 // invalid data, so output data is set to static value of 0
-                m00_axis_real_s2mm_tdata <= 128'b0;
-                m00_axis_imag_s2mm_tdata <= 128'b0;
+                m00_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};
+                m00_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
             end
          end
     end
