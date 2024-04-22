@@ -92,8 +92,8 @@ module axis_multiplier
 
             /*------------------------CHANNEL READY/VALID------------------------*/
             if (m_axis_real_s2mm_tready && s_axis_real_tvalid && m_axis_imag_s2mm_tready && s_axis_imag_tvalid) begin
-                assign m_axis_real_s2mm_tvalid = 1'b1;      
-                assign m_axis_imag_s2mm_tvalid = 1'b1;
+                m_axis_real_s2mm_tvalid = 1'b1;      
+                m_axis_imag_s2mm_tvalid = 1'b1;
                 m_valid <= m_axis_real_s2mm_tvalid && m_axis_imag_s2mm_tvalid;
 
                 // this for loop multiplies every eight bits by bWeights (it'll loop 8 times- 1 time per sample in tdata)
@@ -124,26 +124,26 @@ module axis_multiplier
                     m_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
                 end
 
-                assign m_axis_real_s2mm_tkeep = {(SAMPLES*2){1'b1}};
+                m_axis_real_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m_axis_real_s2mm_tlast <= s_axis_real_tlast; 
-                assign m_axis_imag_s2mm_tkeep = {(SAMPLES*2){1'b1}};
+                m_axis_imag_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m_axis_imag_s2mm_tlast <= s_axis_imag_tlast;
             end
             /*----------------------CHANNEL NOT READY/VALID----------------------*/
             else begin 
                 // output valid is low
-                assign m_axis_real_s2mm_tvalid = 0;
-                assign m_axis_imag_s2mm_tvalid = 0;
+                m_axis_real_s2mm_tvalid = 0;
+                m_axis_imag_s2mm_tvalid = 0;
                 // invalid data, so output data is set to static value of 0
-                assign m_axis_real_s2mm_tdata = {MDATA_WIDTH{0}};
-                assign m_axis_imag_s2mm_tdata = {MDATA_WIDTH{0}};
+                m_axis_real_s2mm_tdata = {MDATA_WIDTH{0}};
+                m_axis_imag_s2mm_tdata = {MDATA_WIDTH{0}};
 
                 // output tkeep is low
-                assign m_axis_real_s2mm_tkeep = {(SAMPLES*2){0}};  
-                assign m_axis_imag_s2mm_tkeep = {(SAMPLES*2){0}};
+                m_axis_real_s2mm_tkeep = {(SAMPLES*2){0}};  
+                m_axis_imag_s2mm_tkeep = {(SAMPLES*2){0}};
 
-                assign m_axis_real_s2mm_tlast = s_axis_real_tlast;    
-                assign m_axis_imag_s2mm_tlast = s_axis_imag_tlast;
+                m_axis_real_s2mm_tlast = s_axis_real_tlast;    
+                m_axis_imag_s2mm_tlast = s_axis_imag_tlast;
             end
         end
     end

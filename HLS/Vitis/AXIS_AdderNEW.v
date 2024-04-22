@@ -145,11 +145,11 @@ module axis_adder
             m21_axis_real_s2mm_tlast <= 1'b0;               m21_axis_imag_s2mm_tlast <= 1'b0;
         end
         else begin
-            assign s00_axis_real_tready = m00_axis_real_s2mm_tready;
-            assign s00_axis_imag_tready = m00_axis_imag_s2mm_tready;
+            s00_axis_real_tready = m00_axis_real_s2mm_tready;
+            s00_axis_imag_tready = m00_axis_imag_s2mm_tready;
 
-            assign m00_axis_real_s2mm_tvalid = 1'b1;                     
-            assign m00_axis_imag_s2mm_tvalid = 1'b1;
+            m00_axis_real_s2mm_tvalid = 1'b1;                     
+            m00_axis_imag_s2mm_tvalid = 1'b1;
             // if all the channels have valid data, then sum them
             if ((s00_axis_real_tvalid && s00_axis_imag_tvalid) && (s01_axis_real_tvalid && s01_axis_imag_tvalid) &&
                 (s20_axis_real_tvalid && s20_axis_imag_tvalid) && (s21_axis_real_tvalid && s21_axis_imag_tvalid)) begin
@@ -172,61 +172,61 @@ module axis_adder
 
                 // keep all sample bytes
                 m00_axis_real_s2mm_tkeep = {(SAMPLES*2){1'b1}};
-                m00_axis_imag_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;
+                m00_axis_imag_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
             end
             // making sure channel00 has output data if not all of the channels have valid data
             else begin 
-                assign s00_axis_real_tready = m00_axis_real_s2mm_tready;
-                assign m00_axis_real_s2mm_tvalid = s00_axis_real_tvalid; 
-                assign m00_axis_real_s2mm_tdata = s00_axis_real_tdata; 
-                assign m00_axis_real_s2mm_tkeep = {(SAMPLES*2){s00_axis_real_tvalid}}; 
-                assign m00_axis_real_s2mm_tlast = s00_axis_real_tlast;
+                s00_axis_real_tready = m00_axis_real_s2mm_tready;
+                m00_axis_real_s2mm_tvalid = s00_axis_real_tvalid; 
+                m00_axis_real_s2mm_tdata = s00_axis_real_tdata; 
+                m00_axis_real_s2mm_tkeep = {(SAMPLES*2){s00_axis_real_tvalid}}; 
+                m00_axis_real_s2mm_tlast = s00_axis_real_tlast;
 
-                assign s00_axis_imag_tready = m00_axis_imag_s2mm_tready;
-                assign m00_axis_imag_s2mm_tvalid = s00_axis_imag_tvalid;
-                assign m00_axis_imag_s2mm_tdata = s00_axis_imag_tdata;
-                assign m00_axis_imag_s2mm_tkeep = {(SAMPLES*2){s00_axis_imag_tvalid}};
-                assign m00_axis_imag_s2mm_tlast = s00_axis_imag_tlast;
+                s00_axis_imag_tready = m00_axis_imag_s2mm_tready;
+                m00_axis_imag_s2mm_tvalid = s00_axis_imag_tvalid;
+                m00_axis_imag_s2mm_tdata = s00_axis_imag_tdata;
+                m00_axis_imag_s2mm_tkeep = {(SAMPLES*2){s00_axis_imag_tvalid}};
+                m00_axis_imag_s2mm_tlast = s00_axis_imag_tlast;
             end
 
             // for channel01, channel20, and channel21 -> outputs = inputs
-            assign s01_axis_real_tready = m01_axis_real_s2mm_tready;
-            assign m01_axis_real_s2mm_tvalid = s01_axis_real_tvalid;
-            assign m01_axis_real_s2mm_tdata = s01_axis_real_tdata; 
-            assign m01_axis_real_s2mm_tkeep = {(SAMPLES*2){s01_axis_real_tvalid}};    
-            assign m01_axis_real_s2mm_tlast = s01_axis_real_tlast;
+            s01_axis_real_tready = m01_axis_real_s2mm_tready;
+            m01_axis_real_s2mm_tvalid = s01_axis_real_tvalid;
+            m01_axis_real_s2mm_tdata = s01_axis_real_tdata; 
+            m01_axis_real_s2mm_tkeep = {(SAMPLES*2){s01_axis_real_tvalid}};    
+            m01_axis_real_s2mm_tlast = s01_axis_real_tlast;
 
-            assign s01_axis_imag_tready = m01_axis_imag_s2mm_tready;
-            assign m01_axis_imag_s2mm_tvalid = s01_axis_imag_tvalid;
-            assign m01_axis_imag_s2mm_tdata = s01_axis_imag_tdata;  
-            assign m01_axis_imag_s2mm_tkeep = {(SAMPLES*2){s01_axis_imag_tvalid}};  
-            assign m01_axis_imag_s2mm_tlast = s01_axis_imag_tlast;
+            s01_axis_imag_tready = m01_axis_imag_s2mm_tready;
+            m01_axis_imag_s2mm_tvalid = s01_axis_imag_tvalid;
+            m01_axis_imag_s2mm_tdata = s01_axis_imag_tdata;  
+            m01_axis_imag_s2mm_tkeep = {(SAMPLES*2){s01_axis_imag_tvalid}};  
+            m01_axis_imag_s2mm_tlast = s01_axis_imag_tlast;
 
-            assign s20_axis_real_tready = m20_axis_real_s2mm_tready;
-            assign m20_axis_real_s2mm_tvalid = s20_axis_real_tvalid; 
-            assign m20_axis_real_s2mm_tdata = s20_axis_real_tdata;  
-            assign m20_axis_real_s2mm_tkeep = {(SAMPLES*2){s20_axis_real_tvalid}};  
-            assign m20_axis_real_s2mm_tlast = s20_axis_real_tlast;
+            s20_axis_real_tready = m20_axis_real_s2mm_tready;
+            m20_axis_real_s2mm_tvalid = s20_axis_real_tvalid; 
+            m20_axis_real_s2mm_tdata = s20_axis_real_tdata;  
+            m20_axis_real_s2mm_tkeep = {(SAMPLES*2){s20_axis_real_tvalid}};  
+            m20_axis_real_s2mm_tlast = s20_axis_real_tlast;
 
-            assign s20_axis_imag_tready = m20_axis_imag_s2mm_tready;
-            assign m20_axis_imag_s2mm_tvalid = s20_axis_imag_tvalid;
-            assign m20_axis_imag_s2mm_tdata = s20_axis_imag_tdata;
-            assign m20_axis_imag_s2mm_tkeep = {(SAMPLES*2){s20_axis_imag_tvalid}};    
-            assign m20_axis_imag_s2mm_tlast = s20_axis_imag_tlast;
+            s20_axis_imag_tready = m20_axis_imag_s2mm_tready;
+            m20_axis_imag_s2mm_tvalid = s20_axis_imag_tvalid;
+            m20_axis_imag_s2mm_tdata = s20_axis_imag_tdata;
+            m20_axis_imag_s2mm_tkeep = {(SAMPLES*2){s20_axis_imag_tvalid}};    
+            m20_axis_imag_s2mm_tlast = s20_axis_imag_tlast;
 
-            assign s21_axis_real_tready = m21_axis_real_s2mm_tready;
-            assign m21_axis_real_s2mm_tvalid = s21_axis_real_tvalid; 
-            assign m21_axis_real_s2mm_tdata = s21_axis_real_tdata;   
-            assign m21_axis_real_s2mm_tkeep = {(SAMPLES*2){s21_axis_real_tvalid}}; 
-            assign m21_axis_real_s2mm_tlast = s21_axis_real_tlast;
+            s21_axis_real_tready = m21_axis_real_s2mm_tready;
+            m21_axis_real_s2mm_tvalid = s21_axis_real_tvalid; 
+            m21_axis_real_s2mm_tdata = s21_axis_real_tdata;   
+            m21_axis_real_s2mm_tkeep = {(SAMPLES*2){s21_axis_real_tvalid}}; 
+            m21_axis_real_s2mm_tlast = s21_axis_real_tlast;
 
-            assign s21_axis_imag_tready = m21_axis_imag_s2mm_tready;
-            assign m21_axis_imag_s2mm_tvalid = s21_axis_imag_tvalid;
-            assign m21_axis_imag_s2mm_tdata = s21_axis_imag_tdata;
-            assign m21_axis_imag_s2mm_tkeep = {(SAMPLES*2){s21_axis_imag_tvalid}};    
-            assign m21_axis_imag_s2mm_tlast = s21_axis_imag_tlast;
+            s21_axis_imag_tready = m21_axis_imag_s2mm_tready;
+            m21_axis_imag_s2mm_tvalid = s21_axis_imag_tvalid;
+            m21_axis_imag_s2mm_tdata = s21_axis_imag_tdata;
+            m21_axis_imag_s2mm_tkeep = {(SAMPLES*2){s21_axis_imag_tvalid}};    
+            m21_axis_imag_s2mm_tlast = s21_axis_imag_tlast;
         end
     end
 endmodule
