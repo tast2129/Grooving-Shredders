@@ -119,9 +119,6 @@ module axis_adder
     // reg [((SSAMPLE_WIDTH+3)-1)*SAMPLES:0]dataBuffer_Sum;
     reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumRe = 0;
     reg [SUM_BUFFER*SAMPLES:0]dataBuffer_SumIm = 0;
-    
-    // buffers for tlast
-    reg [SAMPLES:0] m00_tlast_re = 0;     reg [SAMPLES:0] m00_tlast_im = 0;
 
     always @(posedge clock) begin
         //~resetn
@@ -148,8 +145,6 @@ module axis_adder
             m21_axis_real_s2mm_tlast <= 1'b0;               m21_axis_imag_s2mm_tlast <= 1'b0;
         end
         else begin
-            m00_tlast_re[0] <= s00_axis_real_tlast;
-            m00_tlast_im[0] <= s00_axis_imag_tlast;
             // if all the channels have valid data, then sum them
             if ((s00_axis_real_tvalid && s00_axis_imag_tvalid) && (s01_axis_real_tvalid && s01_axis_imag_tvalid) &&
                 (s20_axis_real_tvalid && s20_axis_imag_tvalid) && (s21_axis_real_tvalid && s21_axis_imag_tvalid)) begin
@@ -161,21 +156,17 @@ module axis_adder
                     
                     // sum of real, weighted data (m00 + m01 + m20 + m21)
                     m00_axis_real_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumRe[i*SUM_BUFFER +: MSAMPLE_WIDTH];
-
-                    m00_tlast_re[i+1] <= m00_tlast_re[i];
                     
                     // rounding the two sums from above by using the LSBs (twos complement addition produces a sum in which we can ignore bit overflow)
                     dataBuffer_SumIm[i*SUM_BUFFER +: SUM_BUFFER] <= s00_axis_imag_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + s01_axis_imag_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH]
                                                          +  s20_axis_imag_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] + s21_axis_imag_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH];
                     // sum of imaginary, weighted data (m00 + m01 + m20 + m21)
                     m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*SUM_BUFFER +: MSAMPLE_WIDTH];
-
-                    m00_tlast_im[i+1] <= m00_tlast_im[i];
-
                 end
 
                 m00_axis_real_s2mm_tvalid <= 1'b1;                      m00_axis_imag_s2mm_tvalid <= 1'b1;
-                m00_axis_real_s2mm_tlast <= m00_tlast_re[SAMPLES];      m00_axis_imag_s2mm_tlast <= m00_tlast_im[SAMPLES];
+                m00_axis_real_s2mm_tlast  <= s00_axis_real_tlast;
+                m00_axis_imag_s2mm_tlast <= <= s00_axis_imag_tlast;
             end
             // making sure channel00 has output data if not all of the channels have valid data
             else begin 
