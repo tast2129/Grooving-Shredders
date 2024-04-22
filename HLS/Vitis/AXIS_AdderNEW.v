@@ -10,7 +10,7 @@ module axis_adder
     parameter MDATA_WIDTH = 128,     // MSAMPLE_WIDTH * SAMPLES
     parameter BUFFER_WIDTH = SSAMPLE_WIDTH+WEIGHT_WIDTH,
     parameter SUM_BUFFER = MSAMPLE_WIDTH+3,
-    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH *2
+    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH
    ) 
     (
 /*======================================BEGIN INPUTS=======================================*/
@@ -171,8 +171,8 @@ module axis_adder
                 end
 
                 // keep all sample bytes
-                m00_axis_real_s2mm_tkeep = {SAMPLES{1'b1}};
-                m00_axis_imag_s2mm_tkeep = {SAMPLES{1'b1}};
+                m00_axis_real_s2mm_tkeep = {(SAMPLES*2){1'b1}};
+                m00_axis_imag_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m00_axis_real_s2mm_tlast <= s00_axis_real_tlast;
                 m00_axis_imag_s2mm_tlast <= s00_axis_imag_tlast;
             end
@@ -181,13 +181,13 @@ module axis_adder
                 assign s00_axis_real_tready = m00_axis_real_s2mm_tready;
                 assign m00_axis_real_s2mm_tvalid = s00_axis_real_tvalid; 
                 assign m00_axis_real_s2mm_tdata = s00_axis_real_tdata; 
-                assign m00_axis_real_s2mm_tkeep = {SAMPLES{s00_axis_real_tvalid}}; 
+                assign m00_axis_real_s2mm_tkeep = {(SAMPLES*2){s00_axis_real_tvalid}}; 
                 assign m00_axis_real_s2mm_tlast = s00_axis_real_tlast;
 
                 assign s00_axis_imag_tready = m00_axis_imag_s2mm_tready;
                 assign m00_axis_imag_s2mm_tvalid = s00_axis_imag_tvalid;
                 assign m00_axis_imag_s2mm_tdata = s00_axis_imag_tdata;
-                assign m00_axis_imag_s2mm_tkeep = {SAMPLES{s00_axis_imag_tvalid}};
+                assign m00_axis_imag_s2mm_tkeep = {(SAMPLES*2){s00_axis_imag_tvalid}};
                 assign m00_axis_imag_s2mm_tlast = s00_axis_imag_tlast;
             end
 
@@ -195,37 +195,37 @@ module axis_adder
             assign s01_axis_real_tready = m01_axis_real_s2mm_tready;
             assign m01_axis_real_s2mm_tvalid = s01_axis_real_tvalid;
             assign m01_axis_real_s2mm_tdata = s01_axis_real_tdata; 
-            assign m01_axis_real_s2mm_tkeep = {SAMPLES{s01_axis_real_tvalid}};    
+            assign m01_axis_real_s2mm_tkeep = {(SAMPLES*2){s01_axis_real_tvalid}};    
             assign m01_axis_real_s2mm_tlast = s01_axis_real_tlast;
 
             assign s01_axis_imag_tready = m01_axis_imag_s2mm_tready;
             assign m01_axis_imag_s2mm_tvalid = s01_axis_imag_tvalid;
             assign m01_axis_imag_s2mm_tdata = s01_axis_imag_tdata;  
-            assign m01_axis_imag_s2mm_tkeep = {SAMPLES{s01_axis_imag_tvalid}};  
+            assign m01_axis_imag_s2mm_tkeep = {(SAMPLES*2){s01_axis_imag_tvalid}};  
             assign m01_axis_imag_s2mm_tlast = s01_axis_imag_tlast;
 
             assign s20_axis_real_tready = m20_axis_real_s2mm_tready;
             assign m20_axis_real_s2mm_tvalid = s20_axis_real_tvalid; 
             assign m20_axis_real_s2mm_tdata = s20_axis_real_tdata;  
-            assign m20_axis_real_s2mm_tkeep = {SAMPLES{s20_axis_real_tvalid}};  
+            assign m20_axis_real_s2mm_tkeep = {(SAMPLES*2){s20_axis_real_tvalid}};  
             assign m20_axis_real_s2mm_tlast = s20_axis_real_tlast;
 
             assign s20_axis_imag_tready = m20_axis_imag_s2mm_tready;
             assign m20_axis_imag_s2mm_tvalid = s20_axis_imag_tvalid;
             assign m20_axis_imag_s2mm_tdata = s20_axis_imag_tdata;
-            assign m20_axis_imag_s2mm_tkeep = {SAMPLES{s20_axis_imag_tvalid}};    
+            assign m20_axis_imag_s2mm_tkeep = {(SAMPLES*2){s20_axis_imag_tvalid}};    
             assign m20_axis_imag_s2mm_tlast = s20_axis_imag_tlast;
 
             assign s21_axis_real_tready = m21_axis_real_s2mm_tready;
             assign m21_axis_real_s2mm_tvalid = s21_axis_real_tvalid; 
             assign m21_axis_real_s2mm_tdata = s21_axis_real_tdata;   
-            assign m21_axis_real_s2mm_tkeep = {SAMPLES{s21_axis_real_tvalid}}; 
+            assign m21_axis_real_s2mm_tkeep = {(SAMPLES*2){s21_axis_real_tvalid}}; 
             assign m21_axis_real_s2mm_tlast = s21_axis_real_tlast;
 
             assign s21_axis_imag_tready = m21_axis_imag_s2mm_tready;
             assign m21_axis_imag_s2mm_tvalid = s21_axis_imag_tvalid;
             assign m21_axis_imag_s2mm_tdata = s21_axis_imag_tdata;
-            assign m21_axis_imag_s2mm_tkeep = {SAMPLES{s21_axis_imag_tvalid}};    
+            assign m21_axis_imag_s2mm_tkeep = {(SAMPLES*2){s21_axis_imag_tvalid}};    
             assign m21_axis_imag_s2mm_tlast = s21_axis_imag_tlast;
         end
     end

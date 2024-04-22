@@ -10,7 +10,7 @@ module axis_multiplier
     parameter MDATA_WIDTH = 128,     // MSAMPLE_WIDTH * SAMPLES
     parameter BUFFER_WIDTH = SSAMPLE_WIDTH+WEIGHT_WIDTH,
     parameter SUM_BUFFER = MSAMPLE_WIDTH+1,
-    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH *2
+    parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH
    ) 
     (
 /*======================================BEGIN INPUTS=======================================*/
@@ -124,9 +124,9 @@ module axis_multiplier
                     m_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
                 end
 
-                assign m_axis_real_s2mm_tkeep = {SAMPLES{1'b1}};
+                assign m_axis_real_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m_axis_real_s2mm_tlast <= s_axis_real_tlast; 
-                assign m_axis_imag_s2mm_tkeep = {SAMPLES{1'b1}};
+                assign m_axis_imag_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m_axis_imag_s2mm_tlast <= s_axis_imag_tlast;
             end
             /*----------------------CHANNEL NOT READY/VALID----------------------*/
@@ -139,8 +139,8 @@ module axis_multiplier
                 assign m_axis_imag_s2mm_tdata = {MDATA_WIDTH{0}};
 
                 // output tkeep is low
-                assign m_axis_real_s2mm_tkeep = {SAMPLES{0}};  
-                assign m_axis_imag_s2mm_tkeep = {SAMPLES{0}};
+                assign m_axis_real_s2mm_tkeep = {(SAMPLES*2){0}};  
+                assign m_axis_imag_s2mm_tkeep = {(SAMPLES*2){0}};
 
                 assign m_axis_real_s2mm_tlast = s_axis_real_tlast;    
                 assign m_axis_imag_s2mm_tlast = s_axis_imag_tlast;
