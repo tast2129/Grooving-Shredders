@@ -9,7 +9,7 @@ module axis_adder
     parameter MSAMPLE_WIDTH = 16,   // SSAMPLE_WIDTH + WEIGHT_WIDTH
     parameter MDATA_WIDTH = 128,     // MSAMPLE_WIDTH * SAMPLES
     parameter BUFFER_WIDTH = SSAMPLE_WIDTH+WEIGHT_WIDTH,
-    parameter SUM_BUFFER = MSAMPLE_WIDTH+3,
+    parameter SUM_BUFFER = MSAMPLE_WIDTH+2,
     parameter SAMPLES = SDATA_WIDTH/SSAMPLE_WIDTH
    ) 
     (
