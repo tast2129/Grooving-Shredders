@@ -2,7 +2,7 @@
  * AXI stream multiplier block taking 128-bit input data and summing it
 */
 
-/* PROBLEMS: tValid triggers too early I think? see snapshots in documentation for version 3.02
+/* PROBLEMS:
  */
 module axis_adder
   #(
@@ -159,8 +159,6 @@ module axis_adder
             s00_axis_real_tready = m00_axis_real_s2mm_tready;
             s00_axis_imag_tready = m00_axis_imag_s2mm_tready;
 
-            m00_axis_real_s2mm_tvalid = 1'b1;                     
-            m00_axis_imag_s2mm_tvalid = 1'b1;
             // if all the channels have valid data, then sum them
             if ((s00_axis_real_tvalid && s00_axis_imag_tvalid) && (s01_axis_real_tvalid && s01_axis_imag_tvalid) &&
                 (s20_axis_real_tvalid && s20_axis_imag_tvalid) && (s21_axis_real_tvalid && s21_axis_imag_tvalid)) begin
@@ -180,6 +178,9 @@ module axis_adder
                     // sum of imaginary, weighted data (m00 + m01 + m20 + m21)
                     m00_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= dataBuffer_SumIm[i*SUM_BUFFER +: MSAMPLE_WIDTH];
                 end
+
+                m00_axis_real_s2mm_tvalid = 1'b1;                     
+                m00_axis_imag_s2mm_tvalid = 1'b1;
 
                 // keep all sample bytes
                 m00_axis_real_s2mm_tkeep = {(SAMPLES*2){1'b1}};
