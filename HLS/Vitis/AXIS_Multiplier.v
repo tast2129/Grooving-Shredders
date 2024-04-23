@@ -1,6 +1,12 @@
 /* 
  * AXI stream multiplier block taking 128-bit input data and 8-bit beamforming weight to apply to data
  */
+ /* PROBLEMS: This seems to start the DMA which never completes a transfer. 
+ *     Seems to just idle forever with:
+ *     Multiplier Input: tValid = 0, tReady = 1, tLast = 1, tData = [something valid-looking]
+ *     Multiplier Output/Adder Input: tValid = 0, tReady = 0, tLast = 1, tData = 0, tKeep = 0000
+ *     Adder Output: tValid = 1, tReady = 0, tLast = 1, tData = 0's, tKeep = 0000
+ */
 module axis_multiplier
   #(
     parameter SDATA_WIDTH = 128,
