@@ -1,7 +1,7 @@
 /* 
  * AXI stream multiplier block taking 128-bit input data and 8-bit beamforming weight to apply to data
  */
- /* PROBLEMS: 
+ /* PROBLEMS: tValid triggers too early I think? see snapshots in documentation for version 3.02
  */
 module axis_multiplier
   #(
