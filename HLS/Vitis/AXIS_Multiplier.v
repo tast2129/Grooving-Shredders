@@ -1,11 +1,7 @@
 /* 
  * AXI stream multiplier block taking 128-bit input data and 8-bit beamforming weight to apply to data
  */
- /* PROBLEMS: This seems to start the DMA which never completes a transfer. 
- *     Seems to just idle forever with:
- *     Multiplier Input: tValid = 0, tReady = 1, tLast = 1, tData = [something valid-looking]
- *     Multiplier Output/Adder Input: tValid = 0, tReady = 0, tLast = 1, tData = 0, tKeep = 0000
- *     Adder Output: tValid = 1, tReady = 0, tLast = 1, tData = 0's, tKeep = 0000
+ /* PROBLEMS: 
  */
 module axis_multiplier
   #(
@@ -44,13 +40,11 @@ module axis_multiplier
 /*=====================================BEGIN OUTPUTS======================================*/
     /*-------------------------Channel00 Output Real & Imag-------------------------*/
     output reg [MDATA_WIDTH-1:0] m_axis_real_s2mm_tdata,
-    output reg [(SDATA_WIDTH/8)-1:0] m_axis_real_s2mm_tkeep,
     output reg m_axis_real_s2mm_tlast,
     input wire m_axis_real_s2mm_tready,
     output reg m_axis_real_s2mm_tvalid,
 
     output reg [MDATA_WIDTH-1:0] m_axis_imag_s2mm_tdata,
-    output reg [(SDATA_WIDTH/8)-1:0] m_axis_imag_s2mm_tkeep,
     output reg m_axis_imag_s2mm_tlast,
     input wire m_axis_imag_s2mm_tready,
     output reg m_axis_imag_s2mm_tvalid
@@ -130,9 +124,7 @@ module axis_multiplier
                     m_axis_imag_s2mm_tdata[i*MSAMPLE_WIDTH +: MSAMPLE_WIDTH] <= addDataBuffer_im[i*(MSAMPLE_WIDTH+1) +: MSAMPLE_WIDTH];
                 end
 
-                m_axis_real_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m_axis_real_s2mm_tlast <= s_axis_real_tlast; 
-                m_axis_imag_s2mm_tkeep = {(SAMPLES*2){1'b1}};
                 m_axis_imag_s2mm_tlast <= s_axis_imag_tlast;
             end
             /*----------------------CHANNEL NOT READY/VALID----------------------*/
@@ -143,10 +135,6 @@ module axis_multiplier
                 // invalid data, so output data is set to static value of 0
                 m_axis_real_s2mm_tdata = {MDATA_WIDTH{0}};
                 m_axis_imag_s2mm_tdata = {MDATA_WIDTH{0}};
-
-                // output tkeep is low
-                m_axis_real_s2mm_tkeep = {(SAMPLES*2){0}};  
-                m_axis_imag_s2mm_tkeep = {(SAMPLES*2){0}};
 
                 m_axis_real_s2mm_tlast = s_axis_real_tlast;    
                 m_axis_imag_s2mm_tlast = s_axis_imag_tlast;

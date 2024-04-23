@@ -135,21 +135,29 @@ module axis_adder
             m00_axis_real_s2mm_tvalid <= 1'b0;              m00_axis_imag_s2mm_tvalid <= 1'b0;
             s00_axis_real_tready <= 1'b0;                   s00_axis_imag_tready <= 1'b0;
             m00_axis_real_s2mm_tlast <= 1'b0;               m00_axis_imag_s2mm_tlast <= 1'b0;
+            m00_axis_real_s2mm_tkeep <= {(SAMPLES*2){0}};  
+            m00_axis_imag_s2mm_tkeep <= {(SAMPLES*2){0}};  
 
             m01_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};   m01_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
             m01_axis_real_s2mm_tvalid <= 1'b0;              m01_axis_imag_s2mm_tvalid <= 1'b0;
             s01_axis_real_tready <= 1'b0;                   s01_axis_imag_tready <= 1'b0;
             m01_axis_real_s2mm_tlast <= 1'b0;               m01_axis_imag_s2mm_tlast <= 1'b0;
+            m01_axis_real_s2mm_tkeep <= {(SAMPLES*2){0}};  
+            m01_axis_imag_s2mm_tkeep <= {(SAMPLES*2){0}};  
 
             m20_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};   m20_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
             m20_axis_real_s2mm_tvalid <= 1'b0;              m20_axis_imag_s2mm_tvalid <= 1'b0;
             s20_axis_real_tready <= 1'b0;                   s20_axis_imag_tready <= 1'b0;
             m20_axis_real_s2mm_tlast <= 1'b0;               m20_axis_imag_s2mm_tlast <= 1'b0;
+            m20_axis_real_s2mm_tkeep <= {(SAMPLES*2){0}};  
+            m20_axis_imag_s2mm_tkeep <= {(SAMPLES*2){0}};  
 
             m21_axis_real_s2mm_tdata <= {MDATA_WIDTH{0}};   m21_axis_imag_s2mm_tdata <= {MDATA_WIDTH{0}};
             m21_axis_real_s2mm_tvalid <= 1'b0;              m21_axis_imag_s2mm_tvalid <= 1'b0;
             s21_axis_real_tready <= 1'b0;                   s21_axis_imag_tready <= 1'b0;
             m21_axis_real_s2mm_tlast <= 1'b0;               m21_axis_imag_s2mm_tlast <= 1'b0;
+            m21_axis_real_s2mm_tkeep <= {(SAMPLES*2){0}};  
+            m21_axis_imag_s2mm_tkeep <= {(SAMPLES*2){0}};  
         end
         else begin
             s00_axis_real_tready = m00_axis_real_s2mm_tready;
