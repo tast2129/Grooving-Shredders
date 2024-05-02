@@ -10,7 +10,7 @@ Email Wes McEvoy @ wemc8162@colorado.edu with any questions.
   * "Python": "delay_and_sum_synthesis.ipynb"
   * "MATLAB": "delay_and_sum_synthesis.ipynb" (same implementation as python code but easier to visualize matrix math)
   * "PYNQ": "beamforming_testing.ipynb" (in construction, high-level implementation)
-* For beamforming IP block (in construction, low-level implementation of delay and sum algorithm) see files in "HLS/Vitis"
+* For beamforming IP block (in construction, low-level implementation of delay and sum algorithm) see files in "HDL"
 
 # Delay and sum algorithm synthesized by "delay_and_sum_synthesis.ipynb" in "python"
 
