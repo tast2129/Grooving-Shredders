@@ -2,14 +2,14 @@
 
 // USER DEFINE
 // time for RFSoC board to take signal intensity measurement at one step (one system position)
-#define MeasureTime 300  // [milliseconds]
+#define MeasureTime 300  // [milliseconds] UPDATE TO MAKE TWITCHES FASTER
 // microsteps (steps per "Step")
 // 1    : 1.8 degrees per step
 // 1/2  : 0.9 degrees per step
 // 1/4  : 0.45 degrees per step
 // 1/8  : 0.225 degrees per step
 // 1/16 : 0.1125 degrees per step
-#define Microstep 1/2
+#define Microstep 1/2 // KEEP AT 1/2 OTHER VALUES DONT WORK
 
 typedef struct {
   const int stepPin = 2;
@@ -21,8 +21,8 @@ typedef struct {
 
 // Define a stepper and the pins it will use
 typedef struct {
-  const float degPerStep = 1.8;
-  const float stepsPerRev = 360 / 1.8;      // w/ 1.8 deg per step and 360 deg in one revolution. Why the factor of two? who's to say
+  const float degPerStep = 1.8;                 // leave alone
+  const float stepsPerRev = 360 / 1.8;          // leave alone
   volatile float theta = 0;                     // current angle the motor is pointing
   volatile int currentPosition = 0;             // in steps from initial position
   const float ustep = ((float)Microstep);       // cast user define Microstep
@@ -35,8 +35,8 @@ stepper stepper1;
 int BFG_pin = A0;
 int BFG_recent_val = 0;
 int BFG_current_val = 0;
-int sweep_degrees = 180;
-int number_of_measurements = (sweep_degrees/.9) + 1;
+int sweep_degrees = 90; // CHANGE TO ANY VALUE, REMEMBER TO UPDATE TO MATCH IN RFOSC CODE
+int number_of_measurements = (sweep_degrees/.9) + 1;  // leave alone
  
 void setup() {
   // initialize the serial port at 9600 bps
@@ -57,7 +57,7 @@ void setup() {
 void loop() {
   Serial.println("Waiting for RFSoC..."); Serial.println();
   Serial.println(""); Serial.println();
-  // Wait for BFG to toggle analog pin
+   Wait for BFG to toggle analog pin
   while(BFG_current_val == BFG_recent_val){
     BFG_current_val = digitalRead(BFG_pin); 
   }
@@ -71,7 +71,7 @@ void loop() {
   Serial.println("Twitching...");
   // Twitch:
   stepper1.currentPosition++; // increment current position (in # of steps from initial position)
-  digitalWrite(stepper1.Pins.dirPin, 0); // rotate clockwise
+  digitalWrite(stepper1.Pins.dirPin, 1); // rotate clockwise
   digitalWrite(stepper1.Pins.stepPin, 1);
   delay(MeasureTime);
   digitalWrite(stepper1.Pins.stepPin, 0);
@@ -87,7 +87,7 @@ void loop() {
     stepper1.theta = 0;
     while (stepper1.currentPosition != 0) {
       Serial.println(stepper1.currentPosition);
-      digitalWrite(stepper1.Pins.dirPin, 1); // rotate counter clockwise
+      digitalWrite(stepper1.Pins.dirPin, 0); // rotate counter clockwise
       digitalWrite(stepper1.Pins.stepPin, 1);
       delay(10); // this can just be something fast (real fast) this being to fast for the twitch slow down to 500 
       digitalWrite(stepper1.Pins.stepPin, 0);
