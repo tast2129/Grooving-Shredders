@@ -1,6 +1,7 @@
 # This is the git for The Grooving Shredders 23-24 Capstone Team
 
 Project Sponsor: Augustus Aerospace
+
 Git contact: Wes McEvoy @ westonmcevoy@gmail.com
 
 # Project Background
@@ -10,6 +11,7 @@ For 8 months, our team worked to build a digital beamformer in the FPGA fabric o
 # Custom Components
 
 Phased Array:
+![Phased_Array](https://github.com/tast2129/Grooving-Shredders/Images/Phased_Array.png)
 
 Turntable Test System:
 
