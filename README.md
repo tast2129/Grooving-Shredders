@@ -3,7 +3,7 @@
 ![Logo](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Grooving%20Shredders%20Final%20Logo.png)
 
 Project Sponsor: Augustus Aerospace
-
+Frequency band: 1.24GHz
 Git contact: Wes McEvoy @ westonmcevoy@gmail.com
 
 # Table of Contents
@@ -16,7 +16,6 @@ Git contact: Wes McEvoy @ westonmcevoy@gmail.com
 * For RFSoC PYNQ layer code see "PYNQ"
 * For motor code and hardware setup image, see "Arduino"
 * For PCB files for AFE and patch antennas see "Gerber Files"
-* For other project documentation, see "Documentation"
 
 # Project Background
 
