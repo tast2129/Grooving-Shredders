@@ -4,24 +4,6 @@ Project Sponsor: Augustus Aerospace
 
 Git contact: Wes McEvoy @ westonmcevoy@gmail.com
 
-# Project Background
-
-For 8 months, our team worked to build a digital beamformer in the FPGA fabric of the RFSoC 4x2 by AMD Xilinx. Although we ran out of time to fully debug the hardware configuration we developed, we learned a lot about the board, RF, DSP and generated some pretty cool results along the way. All radiation patterns seen on this git were generated with the help of our custom test system.
-
-# Custom Components
-
-Phased Array:
-![Phased_Array](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Phased_Array.png)
-
-Turntable Test System:
-
-Analog Front End Board:
-
-
-# Results
-
-
-
 # Table of Contents
 
 * For patch antenna design of phased array see files in "AnsysHFSS"
@@ -33,6 +15,43 @@ Analog Front End Board:
 * For motor code and hardware setup image, see "Arduino"
 * For PCB files for AFE and patch antennas see "Gerber Files"
 * For other project documentation, see "Documentation"
+
+# Project Background
+
+For 8 months, our team worked to build a digital beamformer in the FPGA fabric of the RFSoC 4x2 by AMD Xilinx. Although we ran out of time to fully debug the hardware configuration we developed, we learned a lot about the board, RF, DSP and generated some pretty cool results along the way. All radiation patterns seen on this git were generated with the help of our custom test system.
+
+System Flowchart:
+![Flowchart](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Flowchart.png)
+
+# Custom Components
+
+Phased Array:
+![Phased_Array](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Phased_Array.png)
+
+Turntable Test System:
+![Test_System](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Test_System.jpg)
+
+Analog Front End Board:
+![AFE_PCB](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/AFE_PCB.jpg)
+
+
+# Results
+
+The environment we generated the following results in:
+![Setup](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Test_Setup2.jpeg)
+
+Radiation Pattern for COTS Dipole Antenna:
+![Dipole_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Dipole_Pattern.png)
+
+Radiation Pattern for Custom Patch Antenna:
+![Patch_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Patch_Pattern.png)
+
+Radiation Pattern for Phased Array performing Analog Beamforming:
+![Array_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Broadside_Pattern.png)
+
+The best looking radiation pattern we generated:
+![Pristine_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Phased_Array_Pattern.png)
+
 
 # Delay and sum algorithm synthesized by "delay_and_sum_synthesis.ipynb" in "Python"
 
@@ -51,6 +70,9 @@ Instead, let's undo the phase shifts by multiplying each element's data by beamf
 Now when we sum the signal received by the 4 elements, not only have we received the original transmitted signal, but with around 4x the amplitude!
 
 ![beamforming4](https://github.com/tast2129/Grooving-Shredders/assets/97580315/fbafaabb-2a26-4d0b-9db6-097383a0870f)
+
+For this reason, it's incredibly important to ensure any phase shifts induced by hardware are corrected or compensated so as to make the beamforming as effective as possible:
+![Phase](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Scope_Phase.png)
 
 # References
 
