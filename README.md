@@ -53,10 +53,15 @@ Now when we sum the signal received by the 4 elements, not only have we received
 # References
 
 https://www.rfsoc-pynq.io/
+
 https://pynq.readthedocs.io/en/latest/
+
 https://www.xilinx.com/products/design-tools/vitis/vitis-hls.html#resources
+
 https://discuss.pynq.io/
+
 https://docs.amd.com/r/en-US/ds926-zynq-ultrascale-plus-rfsoc/RF-ADC-Electrical-Characteristics
+
 https://pysdr.org/content/doa.html
 
 
