@@ -30,12 +30,12 @@ System Flowchart:
 Phased Array:
 ![Phased_Array](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Phased_Array.png)
 
-
 Turntable Test System:
+
 ![Test_System](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Test_System.jpg)
 
-
 Analog Front End Board:
+
 ![AFE_PCB](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/AFE_PCB.jpg)
 
 
@@ -50,7 +50,7 @@ Radiation Pattern for COTS Dipole Antenna:
 Radiation Pattern for Custom Patch Antenna:
 ![Patch_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Patch_Pattern.png)
 
-Radiation Pattern for Phased Array performing Analog Beamforming:
+Normalized Radiation Pattern for Phased Array performing Analog Beamforming:
 ![Array_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Broadside_Pattern.png)
 
 The best looking radiation pattern we generated:
