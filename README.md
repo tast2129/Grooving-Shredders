@@ -3,7 +3,9 @@
 ![Logo](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Grooving%20Shredders%20Final%20Logo.png)
 
 Project Sponsor: Augustus Aerospace
+
 Frequency band: 1.24GHz
+
 Git contact: Wes McEvoy @ westonmcevoy@gmail.com
 
 # Table of Contents
