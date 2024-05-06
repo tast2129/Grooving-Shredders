@@ -28,6 +28,7 @@ System Flowchart:
 # Custom Components
 
 Phased Array:
+
 ![Phased_Array](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Phased_Array.png)
 
 Turntable Test System:
@@ -42,18 +43,23 @@ Analog Front End Board:
 # Results
 
 The environment we generated the following results in:
+
 ![Setup](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Test_Setup2.jpeg)
 
 Radiation Pattern for COTS Dipole Antenna:
+
 ![Dipole_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Dipole_Pattern.png)
 
 Radiation Pattern for Custom Patch Antenna:
+
 ![Patch_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Patch_Pattern.png)
 
 Normalized Radiation Pattern for Phased Array performing Analog Beamforming:
+
 ![Array_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Broadside_Pattern.png)
 
 The best looking radiation pattern we generated:
+
 ![Pristine_Pattern](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Phased_Array_Pattern.png)
 
 
@@ -76,6 +82,7 @@ Now when we sum the signal received by the 4 elements, not only have we received
 ![beamforming4](https://github.com/tast2129/Grooving-Shredders/assets/97580315/fbafaabb-2a26-4d0b-9db6-097383a0870f)
 
 For this reason, it's incredibly important to ensure any phase shifts induced by hardware are corrected or compensated so as to make the beamforming as effective as possible:
+
 ![Phase](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Scope_Phase.png)
 
 # References
