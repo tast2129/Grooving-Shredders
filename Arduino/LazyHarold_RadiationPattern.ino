@@ -1,4 +1,4 @@
-// Script used for generating radiation patterns in conjunction with Integration_Testing_2.ipynb ran on the RFSoC
+// Script used for generating radiation patterns in conjunction with Integration_Test_2.ipynb ran on the RFSoC
 
 #include <stdio.h>
 
