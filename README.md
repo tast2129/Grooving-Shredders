@@ -1,5 +1,7 @@
 # This is the git for The Grooving Shredders 23-24 Capstone Team
 
+![Logo](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Grooving%20Shredders%20Final%20Logo.png)
+
 Project Sponsor: Augustus Aerospace
 
 Git contact: Wes McEvoy @ westonmcevoy@gmail.com
@@ -18,7 +20,7 @@ Git contact: Wes McEvoy @ westonmcevoy@gmail.com
 
 # Project Background
 
-For 8 months, our team worked to build a digital beamformer in the FPGA fabric of the RFSoC 4x2 by AMD Xilinx. Although we ran out of time to fully debug the hardware configuration we developed, we learned a lot about the board, RF, DSP and generated some pretty cool results along the way. All radiation patterns seen on this git were generated with the help of our custom test system.
+For 8 months, our team worked to build a digital beamformer in the FPGA fabric of the RFSoC 4x2 by AMD Xilinx. Although we ran out of time to fully debug the hardware configuration we developed, we learned a lot about the board, RF, and DSP and generated some pretty cool results along the way. All radiation patterns seen on this git were generated with the help of our custom test system.
 
 System Flowchart:
 ![Flowchart](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Flowchart.png)
@@ -28,8 +30,10 @@ System Flowchart:
 Phased Array:
 ![Phased_Array](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Phased_Array.png)
 
+
 Turntable Test System:
 ![Test_System](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/Test_System.jpg)
+
 
 Analog Front End Board:
 ![AFE_PCB](https://github.com/tast2129/Grooving-Shredders/blob/main/Images/AFE_PCB.jpg)
